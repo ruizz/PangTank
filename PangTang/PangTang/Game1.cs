@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 
+
 namespace PangTang
 {
     /// <summary>
@@ -22,10 +23,18 @@ namespace PangTang
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        Nozzle nozzle; // Nozzle for the game
-        Funnel funnel; // Funnel for the game
-        Rectangle playAreaRectangle; // Describes playing area
-        Rectangle tankAreaRectangle; // Describes the fish tank area
+        Nozzle nozzle; // Nozzle for the game.
+        Funnel funnel; // Funnel for the game.
+        Water[] water; // Water drops for the game.
+
+        Rectangle playAreaRectangle; // Describes playing area.
+        Rectangle tankAreaRectangle; // Describes the fish tank area.
+        
+        /*
+         * Status
+         */
+        double seconds; // Seconds elapsed. Uses XNA's GameTime
+        int waterCounter; // Position in the water array. 
 
         /*
          * Constructor
@@ -51,6 +60,9 @@ namespace PangTang
                 0,
                 graphics.PreferredBackBufferWidth - tankAreaRectangle.Width,
                 graphics.PreferredBackBufferHeight);
+
+            seconds = 0.0;
+            waterCounter = 0;
 
             this.Window.Title = "PangTang";
         }
@@ -89,6 +101,14 @@ namespace PangTang
             tempTexture = Content.Load<Texture2D>("funnel");
             funnel = new Funnel(tempTexture, playAreaRectangle);
 
+            // Load the water texture
+            tempTexture = Content.Load<Texture2D>("water");
+            water = new Water[10];
+            for (int i = 0; i < 10; i++)
+            {
+                water[i] = new Water(tempTexture, playAreaRectangle);
+            }
+
             StartGame();
         }
 
@@ -116,6 +136,23 @@ namespace PangTang
             funnel.Update();
             nozzle.Update();
 
+            seconds += gameTime.ElapsedGameTime.TotalSeconds; // Elapsed time since last update
+            if (seconds > 1.0)
+            {
+                seconds -= 1.0;
+                if (!water[waterCounter].IsActive())
+                    water[waterCounter].Update(nozzle.GetBounds()); // Spit out a water droplet every second
+                waterCounter++;
+                if (waterCounter == 10)
+                    waterCounter = 0;
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (water[i].IsActive())
+                    water[i].Update(nozzle.GetBounds()); // Water traverses down
+            }
+
             base.Update(gameTime);
         }
 
@@ -132,6 +169,11 @@ namespace PangTang
 
             funnel.Draw(spriteBatch);
             nozzle.Draw(spriteBatch);
+
+            for (int i = 0; i < 10; i++)
+            {
+                water[i].Draw(spriteBatch);
+            }
 
             spriteBatch.End();
 

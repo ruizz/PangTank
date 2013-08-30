@@ -51,7 +51,14 @@ namespace PangTang
         /*
          * Returns
          */
-        // (None)
+        public Rectangle GetBounds()
+        {
+            return new Rectangle(
+             (int) currentPosition.X,
+             (int) currentPosition.Y,
+             texture.Width,
+             texture.Height);
+        }
 
         /*
          * Voids

@@ -13,23 +13,29 @@ namespace PangTang
         /*
          * Positions
          */
-        Vector2 motion;
         Vector2 position;
         Rectangle bounds;
-        float waterSpeed = 4;
+        float waterSpeed = 4f;
+
+        /*
+         * Status
+         */
+        bool isActive;
 
         /*
          * Other
          */
         Texture2D texture;
-        Rectangle screenBounds;
+        Rectangle playAreaRectangle;
 
         /*
          * Constructor
          */
-        public Water(Texture2D texture, Rectangle screenBounds)
+        public Water(Texture2D texture, Rectangle playAreaRectangle)
         {
-            // TODO
+            this.texture = texture;
+            this.playAreaRectangle = playAreaRectangle;
+            isActive = false;
         }
 
 
@@ -49,17 +55,34 @@ namespace PangTang
         // If water misses the funnel and goes out of bounds.
         public bool OffBottom()
         {
-            if (position.Y > screenBounds.Height)
+            if (position.Y > playAreaRectangle.Height)
                 return true;
             return false;
+        }
+
+        public bool IsActive()
+        {
+            return isActive;
         }
 
         /*
          * Voids
          */
-        public void Update()
+        public void Update(Rectangle nozzleBounds)
         {
-            // TODO
+            if (isActive) // Droplet is currently falling down
+            {
+                position.Y += waterSpeed;
+
+                if (OffBottom())
+                    isActive = false;
+            } 
+            else // Droplet needs to come out of nozzle
+            {
+                position.X = nozzleBounds.X + (nozzleBounds.Width / 2);
+                position.Y = nozzleBounds.Height;
+                isActive = true;
+            }
         }
 
         public void FunnelCollision(Rectangle paddleLocation)
@@ -73,13 +96,14 @@ namespace PangTang
             {
                 // Currently just deflects up. Should change this, of course.
                 position.Y = paddleLocation.Y - texture.Height;
-                motion.Y *= -1;
+                //motion.Y *= -1;
             }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, position, Color.White);
+            if (isActive)
+                spriteBatch.Draw(texture, position, Color.White);
         }
 
     }
