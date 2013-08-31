@@ -16,7 +16,7 @@ namespace PangTang
          */
         Vector2 position;
         Vector2 motion; // Defines direction. Y component ignored.
-        float funnelSpeed = 8f;
+        float funnelSpeed = 12f;
 
         /*
          * States
@@ -50,6 +50,16 @@ namespace PangTang
              (int)position.Y,
              texture.Width,
              texture.Height);
+        }
+
+        // Same as GetBounds(), but returns the bounds of the funnel mouth instead.
+        public Rectangle GetCollisionBounds()
+        {
+            return new Rectangle(
+             (int)position.X,
+             (int)position.Y,
+             texture.Width,
+             texture.Height / 10);
         }
 
         /*

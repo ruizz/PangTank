@@ -25,7 +25,7 @@ namespace PangTang
 
         Nozzle nozzle; // Nozzle for the game.
         Funnel funnel; // Funnel for the game.
-        Water[] water; // Water drops for the game.
+        Water water; // Water drops for the game.
 
         Rectangle playAreaRectangle; // Describes playing area.
         Rectangle tankAreaRectangle; // Describes the fish tank area.
@@ -33,8 +33,18 @@ namespace PangTang
         /*
          * Status
          */
+        double waterInterval; // Interval water drops to come out of nozzle.
         double seconds; // Seconds elapsed. Uses XNA's GameTime
-        int waterCounter; // Position in the water array. 
+        int totalDropsCaught; // Total drops caught.
+        int currentLevel;
+        int levelDropRequirement; // Drops required to compelete level. +5 drops for each level.
+        int levelDropsCaught; // Number of drops caught in the level.
+        float speedMultiplier; // How much to speed up the game by whenever level changes.
+
+        /*
+         * Fonts
+         */
+        SpriteFont dropsCaughtFont;
 
         /*
          * Constructor
@@ -61,9 +71,16 @@ namespace PangTang
                 graphics.PreferredBackBufferWidth - tankAreaRectangle.Width,
                 graphics.PreferredBackBufferHeight);
 
-            seconds = 0.0;
-            waterCounter = 0;
+            // Set some starting values.
+            seconds = 0.0f;
+            totalDropsCaught = 0;
+            levelDropsCaught = 0;
+            currentLevel = 1;
 
+            // -- CHANGE ANY DEFAULT STARTING VALUES HERE --
+            waterInterval = 2.0f;
+            levelDropRequirement = 5;
+            speedMultiplier = 1.4f;
             this.Window.Title = "PangTang";
         }
 
@@ -103,11 +120,10 @@ namespace PangTang
 
             // Load the water texture
             tempTexture = Content.Load<Texture2D>("water");
-            water = new Water[10];
-            for (int i = 0; i < 10; i++)
-            {
-                water[i] = new Water(tempTexture, playAreaRectangle);
-            }
+            water = new Water(tempTexture, playAreaRectangle);
+
+            // Load fonts
+            dropsCaughtFont = Content.Load<SpriteFont>("dropsCaughtFont");
 
             StartGame();
         }
@@ -133,24 +149,40 @@ namespace PangTang
                 this.Exit();
 
             // TODO: Add your update logic here
+            
+            // Update all objects to new positions
             funnel.Update();
             nozzle.Update();
+            water.Update();
 
-            seconds += gameTime.ElapsedGameTime.TotalSeconds; // Elapsed time since last update
-            if (seconds > 1.0)
+            // Release a drop during every specified interval
+            seconds += gameTime.ElapsedGameTime.TotalSeconds; // seconds += Elapsed time since last update
+            if (seconds > waterInterval)
             {
-                seconds -= 1.0;
-                if (!water[waterCounter].IsActive())
-                    water[waterCounter].Update(nozzle.GetBounds()); // Spit out a water droplet every second
-                waterCounter++;
-                if (waterCounter == 10)
-                    waterCounter = 0;
+                seconds = 0.0;
+                water.releaseDrop(nozzle.GetBounds());
             }
 
-            for (int i = 0; i < 10; i++)
+            // Increase counters for any water-funnel collisions.
+            int collisions = water.funnelCollisions(funnel.GetCollisionBounds());
+            totalDropsCaught += collisions;
+            levelDropsCaught += collisions;
+
+            // Next level!
+            if (levelDropsCaught == levelDropRequirement)
             {
-                if (water[i].IsActive())
-                    water[i].Update(nozzle.GetBounds()); // Water traverses down
+                currentLevel += 1;
+                levelDropRequirement += 5;
+                levelDropsCaught = 0;
+
+                // Increase speeds
+                nozzle.increaseSpeed(speedMultiplier);
+                water.increaseSpeed(speedMultiplier);
+                waterInterval /= speedMultiplier;
+
+                // Decrease the multiplier so that the speed increases per level don't become drastic.
+                if (speedMultiplier > 1.0f)
+                    speedMultiplier *= 0.98f;
             }
 
             base.Update(gameTime);
@@ -169,15 +201,21 @@ namespace PangTang
 
             funnel.Draw(spriteBatch);
             nozzle.Draw(spriteBatch);
+            water.Draw(spriteBatch);
 
-            for (int i = 0; i < 10; i++)
-            {
-                water[i].Draw(spriteBatch);
-            }
+            DrawText();
 
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        // Draws all text
+        private void DrawText()
+        {
+            spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 20), Color.White);
+            spriteBatch.DrawString(dropsCaughtFont, "Level Drops Caught: " + levelDropsCaught, new Vector2(20, 40), Color.White);
+            spriteBatch.DrawString(dropsCaughtFont, "Total Drops Caught: " + totalDropsCaught, new Vector2(20, 60), Color.White);
         }
 
         // Places the funnel and ball in the start positions.

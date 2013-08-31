@@ -16,10 +16,13 @@ namespace PangTang
         Vector2 currentPosition;
         Vector2 targetPosition;
         Vector2 motion; // Defines direction. Y component ignored.
+
         // Vector of 7 positions that the nozzle will traverse to randomly.
         // Positions are the X values in respect to the entire window.
         int[] positions;
-        float nozzleSpeed = 8f;
+
+        float nozzleStartSpeed = 2f;
+        float nozzleSpeed;
 
         /*
          * Other
@@ -32,8 +35,10 @@ namespace PangTang
          */
         public Nozzle(Texture2D texture, Rectangle playAreaRectangle)
         {
+            // Establish texture, play area, and starting speed.
             this.texture = texture;
             this.playAreaRectangle = playAreaRectangle;
+            nozzleSpeed = nozzleStartSpeed;
 
             // Calculate positions based on the play area.
             positions = new int[7];
@@ -43,7 +48,8 @@ namespace PangTang
                 positions[i] = i * (playAreaRectangle.Width / 6);
                 positions[i] += playAreaRectangle.X;
             }
-            positions[6] = playAreaRectangle.X + playAreaRectangle.Width - texture.Width;
+            positions[6] = playAreaRectangle.X + playAreaRectangle.Width;
+            positions[6] -= texture.Width * 2;
 
             SetInStartPosition();
         }
@@ -78,9 +84,18 @@ namespace PangTang
                     motion.X = -1;
             }
 
+            // Multiply the direction by the speed to calculate the where the nozzle should be.
             motion.X *= nozzleSpeed;
             currentPosition += motion;
+
+            // Re-normalize the motion vector.
             motion.Normalize();
+        }
+
+        // Increments the speed when the level changes.
+        public void increaseSpeed(float speedMultiplier)
+        {
+            nozzleSpeed *= speedMultiplier;
         }
 
         public void SetInStartPosition()
