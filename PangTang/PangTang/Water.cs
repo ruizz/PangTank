@@ -20,6 +20,7 @@ namespace PangTang
          * Status
          */
         int counter = 0; // Keeps track of which water drop to release.
+        int missedCount = 0; // Keeps track of number of drops missed.
         bool[] isActive;
         float waterStartSpeed = 3f;
         float waterSpeed;
@@ -71,7 +72,10 @@ namespace PangTang
         public bool OffBottom(int which)
         {
             if (positions[which].Y > playAreaRectangle.Height)
+            {
+                missedCount++;
                 return true;
+            }
             return false;
         }
 
@@ -112,6 +116,12 @@ namespace PangTang
             }
 
             return false;
+        }
+
+        // Returns number of missed drops
+        public int missedDropCount()
+        {
+            return missedCount;
         }
 
         /*
@@ -163,6 +173,5 @@ namespace PangTang
                     spriteBatch.Draw(texture, positions[i], Color.White);
             }
         }
-
     }
 }
