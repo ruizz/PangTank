@@ -40,10 +40,11 @@ namespace PangTang
 
         enum GameState  // State of the game
         {
-            TitleScreen = 0,
-            GameStarted = 1,
-            GameEnded = 2,
-            HighScores = 3,
+            TitleScreen         = 0,
+            StartingAnimation   = 1,
+            GameStarted         = 2,
+            GameEnded           = 3,
+            HighScores          = 4,
         }
 
         KeyboardState keyboardState;
@@ -184,9 +185,11 @@ namespace PangTang
                     keyboardState = Keyboard.GetState();
                     gamePadState = GamePad.GetState(PlayerIndex.One);
                     if (keyboardState.IsKeyDown(Keys.S))
-                        gameState = 1;
+                        gameState = 2;
                     break;
                 case 1:
+                    break;
+                case 2:
                     // Allows the game to exit
                     if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                         this.Exit();
@@ -230,13 +233,13 @@ namespace PangTang
 
                     // Game Over
                     if (water.missedDropCount() == gameOverNumber) 
-                        gameState = 2;
+                        gameState = 3;
 
                     base.Update(gameTime);
                     break;
-                case 2:
-                    break;
                 case 3:
+                    break;
+                case 4:
                     break;
             }
         }
@@ -261,6 +264,8 @@ namespace PangTang
                     base.Draw(gameTime);
                     break;
                 case 1:
+                    break;
+                case 2:
                     // TODO: Add your drawing code here
                     spriteBatch.Begin();
 
@@ -275,7 +280,7 @@ namespace PangTang
 
                     base.Draw(gameTime);
                     break;
-                case 2:
+                case 3:
                     spriteBatch.Begin();
                     
                     DrawText();
@@ -284,7 +289,7 @@ namespace PangTang
 
                     base.Draw(gameTime);
                     break;
-                case 3:
+                case 4:
                     break;
             }
         }
@@ -299,15 +304,17 @@ namespace PangTang
                     spriteBatch.DrawString(dropsCaughtFont, "Press S to Start", new Vector2(350, 150), Color.White);
                     break;
                 case 1:
+                    break;
+                case 2:
                     spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 20), Color.White);
                     spriteBatch.DrawString(dropsCaughtFont, "Level Drops Caught: " + levelDropsCaught, new Vector2(20, 40), Color.White);
                     spriteBatch.DrawString(dropsCaughtFont, "Total Drops Caught: " + totalDropsCaught, new Vector2(20, 60), Color.White);
                     break;
-                case 2:
+                case 3:
                     spriteBatch.DrawString(dropsCaughtFont, "Game Over", new Vector2(350, 100), Color.White);
                     spriteBatch.DrawString(dropsCaughtFont, "Your Score: " + totalDropsCaught, new Vector2(350, 200), Color.White);
                     break;
-                case 3:
+                case 4:
                     break;
             }
         }
