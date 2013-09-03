@@ -28,18 +28,20 @@ namespace PangTang
         /*
          * Other
          */
-        Texture2D texture;
+        Texture2D[] texture;
+        int textureStage;
         Rectangle playAreaRectangle;
 
         /*
          * Constructor
          */
-        public Water(Texture2D texture, Rectangle playAreaRectangle)
+        public Water(Texture2D[] texture, Rectangle playAreaRectangle)
         {
             // Establish texture, water width/height, play area, starting speed, and active state.
             this.texture = texture;
-            bounds.Width = texture.Width;
-            bounds.Height = texture.Height;
+            textureStage = 0;
+            bounds.Width = texture[0].Width;
+            bounds.Height = texture[0].Height;
             this.playAreaRectangle = playAreaRectangle;
             waterSpeed = waterStartSpeed;
 
@@ -63,24 +65,22 @@ namespace PangTang
         }
 
         // If a water droplet is active or not.
-        public bool IsActive(int which)
+        private bool IsActive(int which)
         {
             return isActive[which];
         }
 
         // If water misses the funnel and goes out of bounds.
-        public bool OffBottom(int which)
+        private bool OffBottom(int which)
         {
             if (positions[which].Y > playAreaRectangle.Height)
-            {
-                missedCount++;
                 return true;
-            }
+
             return false;
         }
 
         // Returns the number of collisions with the funnel.
-        public int funnelCollisions(Rectangle funnelMouth)
+        public int getFunnelCollisions(Rectangle funnelMouth)
         {
             int collisions = 0;
 
@@ -98,15 +98,15 @@ namespace PangTang
 
         // If a drop has collided with the funnel or not.
         // Will deactivate a drop if a collision is detected.
-        public bool collidedWithFunnel(Rectangle funnelMouth, int which)
+        private bool collidedWithFunnel(Rectangle funnelMouth, int which)
         {
             if (isActive[which])
             {
                 Rectangle waterLocation = new Rectangle(
                  (int)positions[which].X,
-                 (int)positions[which].Y + texture.Height,
-                 texture.Width,
-                 texture.Height / 10);
+                 (int)positions[which].Y + texture[0].Height,
+                 texture[0].Width,
+                 texture[0].Height / 10);
 
                 if (funnelMouth.Intersects(waterLocation))
                 {
@@ -118,10 +118,15 @@ namespace PangTang
             return false;
         }
 
-        // Returns number of missed drops
-        public int missedDropCount()
+        // Returns the number of funnel misses since the last update.
+        public int getFunnelMisses()
         {
-            return missedCount;
+            int funnelMisses = missedCount;
+
+            // Reset the missed count.
+            missedCount = 0;
+
+            return funnelMisses;
         }
 
         /*
@@ -137,7 +142,10 @@ namespace PangTang
 
                     // If drop falls off the bottom, it's no longer active.
                     if (OffBottom(i))
+                    {
+                        missedCount++;
                         isActive[i] = false;
+                    }
                 }
             }
         }
@@ -167,10 +175,27 @@ namespace PangTang
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            for (int i = 0; i < positions.Length; i++)
+            for (int i = 0; i < positions.Length; i++) // For all water droplets...
             {
-                if (isActive[i])
-                    spriteBatch.Draw(texture, positions[i], Color.White);
+                if (isActive[i]) // ... if the water droplet is active.
+                {
+                    if (textureStage <= 4) // Draw first sprite.
+                        spriteBatch.Draw(texture[0], positions[i], Color.White);
+
+                    if (textureStage > 4 && textureStage <= 8) // Draw second sprite.
+                        spriteBatch.Draw(texture[1], positions[i], Color.White);
+
+                    if (textureStage > 8) // Draw third sprite.
+                    {
+                        spriteBatch.Draw(texture[2], positions[i], Color.White);
+
+                        // Reset the texture stage once the third sprite finishes animating.
+                        if (textureStage >= 12)
+                            textureStage = -1;
+                    }
+
+                    textureStage++;
+                }
             }
         }
     }

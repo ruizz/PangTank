@@ -28,6 +28,7 @@ namespace PangTang
         Nozzle nozzle; // Nozzle for the game.
         Funnel funnel; // Funnel for the game.
         Water water; // Water drops for the game.
+        Tank tank; // Tank for the game.
 
         Border border; // Border between tank and play area
 
@@ -56,7 +57,6 @@ namespace PangTang
          * Status
          */
 
-        
         double waterInterval; // Interval water drops to come out of nozzle.
         double seconds; // Seconds elapsed. Uses XNA's GameTime
         int totalDropsCaught; // Total drops caught.
@@ -64,8 +64,6 @@ namespace PangTang
         int levelDropRequirement; // Drops required to compelete level. +5 drops for each level.
         int levelDropsCaught; // Number of drops caught in the level.
         float speedMultiplier; // How much to speed up the game by whenever level changes.
-
-        int gameOverNumber; // If missed this number of drops, game over
 
         /*
          * Fonts
@@ -103,8 +101,6 @@ namespace PangTang
             totalDropsCaught = 0;
             levelDropsCaught = 0;
             currentLevel = 1;
-            gameOverNumber = 3;
-
             gameState = 0;
 
             // -- CHANGE ANY DEFAULT STARTING VALUES HERE --
@@ -138,27 +134,56 @@ namespace PangTang
             // TODO: use this.Content to load your game content here
 
             // Temporary texture for loading textures. In this case the funnel, nozzle, etc.
-            Texture2D tempTexture;
+            Texture2D[] tempTexture;
+
+            // Same as tempTexture, but this one is used for the tank.
+            Texture2D[,] temp2DTexture;
 
             // Load the nozzle texture
-            tempTexture = Content.Load<Texture2D>("nozzle");
+            tempTexture = new Texture2D[3];
+            tempTexture[0] = Content.Load<Texture2D>("nozzle_0");
+            tempTexture[1] = Content.Load<Texture2D>("nozzle_1");
+            tempTexture[2] = Content.Load<Texture2D>("nozzle_2");
             nozzle = new Nozzle(tempTexture, playAreaRectangle);
 
             // Load the funnel texture
-            tempTexture = Content.Load<Texture2D>("funnel");
+            tempTexture = new Texture2D[3];
+            tempTexture[0] = Content.Load<Texture2D>("funnel_0");
+            tempTexture[1] = Content.Load<Texture2D>("funnel_1");
+            tempTexture[2] = Content.Load<Texture2D>("funnel_2");
             funnel = new Funnel(tempTexture, playAreaRectangle);
 
             // Load the water texture
-            tempTexture = Content.Load<Texture2D>("water");
+            tempTexture = new Texture2D[3];
+            tempTexture[0] = Content.Load<Texture2D>("water_0");
+            tempTexture[1] = Content.Load<Texture2D>("water_1");
+            tempTexture[2] = Content.Load<Texture2D>("water_2");
             water = new Water(tempTexture, playAreaRectangle);
+
+            // Load Tank (3x the sprites)
+            temp2DTexture = new Texture2D[3, 3];
+            temp2DTexture[0, 0] = Content.Load<Texture2D>("tank_0_0"); 
+            temp2DTexture[0, 1] = Content.Load<Texture2D>("tank_0_1"); 
+            temp2DTexture[0, 2] = Content.Load<Texture2D>("tank_0_2");
+
+            temp2DTexture[1, 0] = Content.Load<Texture2D>("tank_1_0");
+            temp2DTexture[1, 1] = Content.Load<Texture2D>("tank_1_1");
+            temp2DTexture[1, 2] = Content.Load<Texture2D>("tank_1_2");
+
+            temp2DTexture[2, 0] = Content.Load<Texture2D>("tank_2_0");
+            temp2DTexture[2, 1] = Content.Load<Texture2D>("tank_2_1");
+            temp2DTexture[2, 2] = Content.Load<Texture2D>("tank_2_2");
+
+            tank = new Tank(temp2DTexture, tankAreaRectangle);
 
             // Load fonts
             dropsCaughtFont = Content.Load<SpriteFont>("dropsCaughtFont");
             titleScreenFont = Content.Load<SpriteFont>("titleScreenFont");
 
             // Load Border
-            tempTexture = Content.Load<Texture2D>("tempBorder");
-            border = new Border(tempTexture, playAreaRectangle);
+            tempTexture = new Texture2D[1];
+            tempTexture[0] = Content.Load<Texture2D>("tempBorder");
+            border = new Border(tempTexture[0], playAreaRectangle);
 
             StartGame();
         }
@@ -181,20 +206,19 @@ namespace PangTang
         {
             switch (gameState)
             {
-                case 0:
+                case 0: // Title screen
                     keyboardState = Keyboard.GetState();
                     gamePadState = GamePad.GetState(PlayerIndex.One);
                     if (keyboardState.IsKeyDown(Keys.S))
                         gameState = 2;
                     break;
-                case 1:
+                case 1: // Starting animation
                     break;
-                case 2:
+                case 2: // Game Started
+
                     // Allows the game to exit
                     if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                         this.Exit();
-
-                    // TODO: Add your update logic here
 
                     // Update all objects to new positions
                     funnel.Update();
@@ -210,9 +234,13 @@ namespace PangTang
                     }
 
                     // Increase counters for any water-funnel collisions.
-                    int collisions = water.funnelCollisions(funnel.GetCollisionBounds());
+                    int collisions = water.getFunnelCollisions(funnel.GetCollisionBounds());
                     totalDropsCaught += collisions;
                     levelDropsCaught += collisions;
+
+                    // Update the tank threshold
+                    int misses = water.getFunnelMisses();
+                    tank.updateThreshold(levelDropRequirement, misses);
 
                     // Next level!
                     if (levelDropsCaught == levelDropRequirement)
@@ -232,14 +260,14 @@ namespace PangTang
                     }
 
                     // Game Over
-                    if (water.missedDropCount() == gameOverNumber) 
+                    if (tank.getTankLevel() == 3) 
                         gameState = 3;
 
                     base.Update(gameTime);
                     break;
-                case 3:
+                case 3: // Game Ended
                     break;
-                case 4:
+                case 4: // High Scores
                     break;
             }
         }
@@ -250,11 +278,11 @@ namespace PangTang
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.White);
 
             switch (gameState)
             {
-                case 0:
+                case 0: // Title Screen
                     spriteBatch.Begin();
                     
                     DrawText();
@@ -263,16 +291,16 @@ namespace PangTang
 
                     base.Draw(gameTime);
                     break;
-                case 1:
+                case 1: // Starting Animation
                     break;
-                case 2:
-                    // TODO: Add your drawing code here
+                case 2: // Game Started
                     spriteBatch.Begin();
 
                     funnel.Draw(spriteBatch);
                     nozzle.Draw(spriteBatch);
                     water.Draw(spriteBatch);
                     border.Draw(spriteBatch);
+                    tank.Draw(spriteBatch);
 
                     DrawText();
 
@@ -280,7 +308,7 @@ namespace PangTang
 
                     base.Draw(gameTime);
                     break;
-                case 3:
+                case 3: // Game Ended
                     spriteBatch.Begin();
                     
                     DrawText();
@@ -289,7 +317,7 @@ namespace PangTang
 
                     base.Draw(gameTime);
                     break;
-                case 4:
+                case 4: // High Scores
                     break;
             }
         }
@@ -299,22 +327,22 @@ namespace PangTang
         {
             switch (gameState)
             {
-                case 0:
-                    spriteBatch.DrawString(titleScreenFont, "Temporary Title", new Vector2(350, 100), Color.White);
-                    spriteBatch.DrawString(dropsCaughtFont, "Press S to Start", new Vector2(350, 150), Color.White);
+                case 0: // Title Screen
+                    spriteBatch.DrawString(titleScreenFont, "Temporary Title", new Vector2(350, 100), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, "Press S to Start", new Vector2(350, 150), Color.Black);
                     break;
-                case 1:
+                case 1: // Starting Animation
                     break;
-                case 2:
-                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 20), Color.White);
-                    spriteBatch.DrawString(dropsCaughtFont, "Level Drops Caught: " + levelDropsCaught, new Vector2(20, 40), Color.White);
-                    spriteBatch.DrawString(dropsCaughtFont, "Total Drops Caught: " + totalDropsCaught, new Vector2(20, 60), Color.White);
+                case 2: // Game Started
+                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 20), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, "Level Drops Caught: " + levelDropsCaught, new Vector2(20, 50), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, "Total Drops Caught: " + totalDropsCaught, new Vector2(20, 80), Color.Black);
                     break;
-                case 3:
-                    spriteBatch.DrawString(dropsCaughtFont, "Game Over", new Vector2(350, 100), Color.White);
-                    spriteBatch.DrawString(dropsCaughtFont, "Your Score: " + totalDropsCaught, new Vector2(350, 200), Color.White);
+                case 3: // Game Ended
+                    spriteBatch.DrawString(dropsCaughtFont, "Game Over", new Vector2(350, 100), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, "Your Score: " + totalDropsCaught, new Vector2(350, 200), Color.Black);
                     break;
-                case 4:
+                case 4: // High Scores
                     break;
             }
         }

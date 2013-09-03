@@ -108,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Border.cs" />
+    <Compile Include="Tank.cs" />
     <Compile Include="Water.cs" />
     <Compile Include="Nozzle.cs" />
     <Compile Include="Funnel.cs" />

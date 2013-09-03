@@ -11,44 +11,91 @@ namespace PangTang
     class Tank
     {
         /*
+         * Positions
+         */
+        Vector2 position; // Where the tank should be drawn
+
+        /*
          * Objects
          */
+        float currentThreshold; // 1 is full, 0 empty
+        Rectangle tankAreaRectangle; // The area that is not the play area. (The left side)
         
-        float currentThreshold;
-
 
         /*
          * Other
          */
-
-        Texture2D texture;
+        Texture2D[,] texture; // A 2D array, to represent  all full, 2/3 full, and 1/3 full sprites.
+        int textureStage = 0;
 
         /*
          * Constructor
          */
-
-        public Tank(Texture2D texture)
+        public Tank(Texture2D[,] texture, Rectangle tankAreaRectangle)
         {
             this.texture = texture;
             currentThreshold = 1.0f;
+            this.tankAreaRectangle = tankAreaRectangle;
+
+            // Position reflects the center of the tank area rectangle.
+            position.X = (tankAreaRectangle.Width - texture[0, 0].Width) / 2;
+            position.X += tankAreaRectangle.X;
+            position.Y = (tankAreaRectangle.Height - texture[0, 0].Height) / 2;
+            position.Y += tankAreaRectangle.Y;
         }
 
         /*
          * Returns
          */
 
-        public float getThreshold()
+        // 0 = full, 1 = 2/3 full, 2 = 1/3 full, 3 = empty
+        public int getTankLevel()
         {
-            return currentThreshold;
+            if (currentThreshold >= 0.66f)
+                return 0;
+
+            if (currentThreshold >= 0.33f)
+                return 1;
+
+            if (currentThreshold > 0.0f)
+                return 2;
+
+            return 3;
         }
 
         /*
          * Voids
          */
 
-        public void updateThreshold(int levelDropRequirement)
+        // Decrements the tank level
+        public void updateThreshold(int levelDropRequirement, int numOfCollisions)
         {
-            // TODO
+            float amountToDecrement = (1.0f / (float) levelDropRequirement) * (float) numOfCollisions;
+            currentThreshold -= amountToDecrement;
+
+            // Resolves an odd case were you get an extremely small number instead of an expected 0
+            if (currentThreshold <= 0.0001f)
+                currentThreshold = 0.0f;
+        }
+
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            if (textureStage <= 4) // Draw first sprite.
+                spriteBatch.Draw(texture[getTankLevel(), 0], position, Color.White);
+
+            if (textureStage > 4 && textureStage <= 8) // Draw second sprite.
+                spriteBatch.Draw(texture[getTankLevel(), 1], position, Color.White);
+
+            if (textureStage > 8) // Draw third sprite.
+            {
+                spriteBatch.Draw(texture[getTankLevel(), 2], position, Color.White);
+
+                // Reset the texture stage once the third sprite finishes animating.
+                if (textureStage >= 12)
+                    textureStage = -1;
+            }
+
+            textureStage++;
         }
 
     }

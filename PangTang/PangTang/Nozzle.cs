@@ -27,16 +27,18 @@ namespace PangTang
         /*
          * Other
          */
-        Texture2D texture;
+        Texture2D[] texture;
+        int textureStage;
         Rectangle playAreaRectangle; // Bounds for play area
 
         /*
          * Constructor
          */
-        public Nozzle(Texture2D texture, Rectangle playAreaRectangle)
+        public Nozzle(Texture2D[] texture, Rectangle playAreaRectangle)
         {
             // Establish texture, play area, and starting speed.
             this.texture = texture;
+            textureStage = 0;
             this.playAreaRectangle = playAreaRectangle;
             nozzleSpeed = nozzleStartSpeed;
 
@@ -49,7 +51,7 @@ namespace PangTang
                 positions[i] += playAreaRectangle.X;
             }
             positions[6] = playAreaRectangle.X + playAreaRectangle.Width;
-            positions[6] -= texture.Width * 2;
+            positions[6] -= texture[0].Width * 2;
 
             SetInStartPosition();
         }
@@ -62,8 +64,8 @@ namespace PangTang
             return new Rectangle(
              (int) currentPosition.X,
              (int) currentPosition.Y,
-             texture.Width,
-             texture.Height);
+             texture[0].Width,
+             texture[0].Height);
         }
 
         /*
@@ -72,8 +74,8 @@ namespace PangTang
         public void Update()
         {
             
-            if ((motion.X == 1 && currentPosition.X > targetPosition.X) ||
-                (motion.X == -1 && currentPosition.X < targetPosition.X))
+            if ((motion.X >= 0 && currentPosition.X > targetPosition.X) ||
+                (motion.X < 0 && currentPosition.X < targetPosition.X))
             {
                 Random rand = new Random();
                 targetPosition.X = positions[rand.Next(0, 7)];
@@ -100,7 +102,7 @@ namespace PangTang
 
         public void SetInStartPosition()
         {
-            currentPosition.X = (playAreaRectangle.Width - texture.Width) / 2;
+            currentPosition.X = (playAreaRectangle.Width - texture[0].Width) / 2;
             currentPosition.X += playAreaRectangle.X;
             currentPosition.Y = 0;
 
@@ -116,7 +118,22 @@ namespace PangTang
 
         public void Draw(SpriteBatch spriteBatch)
         {
-                spriteBatch.Draw(texture, currentPosition, Color.White);
+            if (textureStage <= 4) // Draw first sprite.
+                spriteBatch.Draw(texture[0], currentPosition, Color.White);
+
+            if (textureStage > 4 && textureStage <= 8) // Draw second sprite.
+                spriteBatch.Draw(texture[1], currentPosition, Color.White);
+
+            if (textureStage > 8) // Draw third sprite.
+            {
+                spriteBatch.Draw(texture[2], currentPosition, Color.White);
+
+                // Reset the texture stage once the third sprite finishes animating.
+                if (textureStage >= 12)
+                    textureStage = -1;
+            }
+
+            textureStage++;
         }
     }
 }
