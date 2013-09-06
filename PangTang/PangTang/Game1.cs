@@ -25,6 +25,7 @@ namespace PangTang
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        Title title; // Title screen for the game.
         Nozzle nozzle; // Nozzle for the game.
         Funnel funnel; // Funnel for the game.
         Water water; // Water drops for the game.
@@ -49,6 +50,7 @@ namespace PangTang
         }
 
         KeyboardState keyboardState;
+        MouseState mouseState;
         GamePadState gamePadState;
         int gameState;  // The current game state
 
@@ -133,57 +135,69 @@ namespace PangTang
 
             // TODO: use this.Content to load your game content here
 
-            // Temporary texture for loading textures. In this case the funnel, nozzle, etc.
-            Texture2D[] tempTexture;
+            // Temporary texture for loading textures. e.g. The title logo
+            Texture2D tempTexture;
+
+            // Temporary texture for loading textures that are animated. In this case the funnel, nozzle, etc.
+            Texture2D[] tempTextureArray;
 
             // Same as tempTexture, but this one is used for the tank.
-            Texture2D[,] temp2DTexture;
+            Texture2D[,] tempTexture2DArray;
+
+            // Load title texture
+            tempTexture = Content.Load<Texture2D>("title");
+
+            tempTextureArray = new Texture2D[3];
+            tempTextureArray[0] = Content.Load<Texture2D>("tank_1_0");
+            tempTextureArray[1] = Content.Load<Texture2D>("tank_1_1");
+            tempTextureArray[2] = Content.Load<Texture2D>("tank_1_2");
+            //new Title(tempTexture, tempTextureArray, "backgroundTexture", new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
+            title = new Title(tempTexture, tempTextureArray, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
 
             // Load the nozzle texture
-            tempTexture = new Texture2D[3];
-            tempTexture[0] = Content.Load<Texture2D>("nozzle_0");
-            tempTexture[1] = Content.Load<Texture2D>("nozzle_1");
-            tempTexture[2] = Content.Load<Texture2D>("nozzle_2");
-            nozzle = new Nozzle(tempTexture, playAreaRectangle);
+            tempTextureArray = new Texture2D[3];
+            tempTextureArray[0] = Content.Load<Texture2D>("nozzle_0");
+            tempTextureArray[1] = Content.Load<Texture2D>("nozzle_1");
+            tempTextureArray[2] = Content.Load<Texture2D>("nozzle_2");
+            nozzle = new Nozzle(tempTextureArray, playAreaRectangle);
 
             // Load the funnel texture
-            tempTexture = new Texture2D[3];
-            tempTexture[0] = Content.Load<Texture2D>("funnel_0");
-            tempTexture[1] = Content.Load<Texture2D>("funnel_1");
-            tempTexture[2] = Content.Load<Texture2D>("funnel_2");
-            funnel = new Funnel(tempTexture, playAreaRectangle);
+            tempTextureArray = new Texture2D[3];
+            tempTextureArray[0] = Content.Load<Texture2D>("funnel_0");
+            tempTextureArray[1] = Content.Load<Texture2D>("funnel_1");
+            tempTextureArray[2] = Content.Load<Texture2D>("funnel_2");
+            funnel = new Funnel(tempTextureArray, playAreaRectangle);
 
             // Load the water texture
-            tempTexture = new Texture2D[3];
-            tempTexture[0] = Content.Load<Texture2D>("water_0");
-            tempTexture[1] = Content.Load<Texture2D>("water_1");
-            tempTexture[2] = Content.Load<Texture2D>("water_2");
-            water = new Water(tempTexture, playAreaRectangle);
+            tempTextureArray = new Texture2D[3];
+            tempTextureArray[0] = Content.Load<Texture2D>("water_0");
+            tempTextureArray[1] = Content.Load<Texture2D>("water_1");
+            tempTextureArray[2] = Content.Load<Texture2D>("water_2");
+            water = new Water(tempTextureArray, playAreaRectangle);
 
             // Load Tank (3x the sprites)
-            temp2DTexture = new Texture2D[3, 3];
-            temp2DTexture[0, 0] = Content.Load<Texture2D>("tank_0_0"); 
-            temp2DTexture[0, 1] = Content.Load<Texture2D>("tank_0_1"); 
-            temp2DTexture[0, 2] = Content.Load<Texture2D>("tank_0_2");
+            tempTexture2DArray = new Texture2D[3, 3];
+            tempTexture2DArray[0, 0] = Content.Load<Texture2D>("tank_0_0"); 
+            tempTexture2DArray[0, 1] = Content.Load<Texture2D>("tank_0_1"); 
+            tempTexture2DArray[0, 2] = Content.Load<Texture2D>("tank_0_2");
 
-            temp2DTexture[1, 0] = Content.Load<Texture2D>("tank_1_0");
-            temp2DTexture[1, 1] = Content.Load<Texture2D>("tank_1_1");
-            temp2DTexture[1, 2] = Content.Load<Texture2D>("tank_1_2");
+            tempTexture2DArray[1, 0] = Content.Load<Texture2D>("tank_1_0");
+            tempTexture2DArray[1, 1] = Content.Load<Texture2D>("tank_1_1");
+            tempTexture2DArray[1, 2] = Content.Load<Texture2D>("tank_1_2");
 
-            temp2DTexture[2, 0] = Content.Load<Texture2D>("tank_2_0");
-            temp2DTexture[2, 1] = Content.Load<Texture2D>("tank_2_1");
-            temp2DTexture[2, 2] = Content.Load<Texture2D>("tank_2_2");
+            tempTexture2DArray[2, 0] = Content.Load<Texture2D>("tank_2_0");
+            tempTexture2DArray[2, 1] = Content.Load<Texture2D>("tank_2_1");
+            tempTexture2DArray[2, 2] = Content.Load<Texture2D>("tank_2_2");
 
-            tank = new Tank(temp2DTexture, tankAreaRectangle);
+            tank = new Tank(tempTexture2DArray, tankAreaRectangle);
 
             // Load fonts
             dropsCaughtFont = Content.Load<SpriteFont>("dropsCaughtFont");
-            titleScreenFont = Content.Load<SpriteFont>("titleScreenFont");
 
             // Load Border
-            tempTexture = new Texture2D[1];
-            tempTexture[0] = Content.Load<Texture2D>("tempBorder");
-            border = new Border(tempTexture[0], playAreaRectangle);
+            tempTextureArray = new Texture2D[1];
+            tempTextureArray[0] = Content.Load<Texture2D>("tempBorder");
+            border = new Border(tempTextureArray[0], playAreaRectangle);
 
             StartGame();
         }
@@ -207,10 +221,16 @@ namespace PangTang
             switch (gameState)
             {
                 case 0: // Title screen
-                    keyboardState = Keyboard.GetState();
+                    this.IsMouseVisible = true;
+                    //keyboardState = Keyboard.GetState();
+                    mouseState = Mouse.GetState();
                     gamePadState = GamePad.GetState(PlayerIndex.One);
-                    if (keyboardState.IsKeyDown(Keys.S))
+                    //if (keyboardState.IsKeyDown(Keys.S))
+                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        this.IsMouseVisible = false;
                         gameState = 2;
+                    }
                     break;
                 case 1: // Starting animation
                     break;
@@ -284,7 +304,8 @@ namespace PangTang
             {
                 case 0: // Title Screen
                     spriteBatch.Begin();
-                    
+
+                    title.Draw(spriteBatch);
                     DrawText();
 
                     spriteBatch.End();
@@ -328,8 +349,7 @@ namespace PangTang
             switch (gameState)
             {
                 case 0: // Title Screen
-                    spriteBatch.DrawString(titleScreenFont, "Temporary Title", new Vector2(350, 100), Color.Black);
-                    spriteBatch.DrawString(dropsCaughtFont, "Press S to Start", new Vector2(350, 150), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, "Click to start.", new Vector2(350, (graphics.PreferredBackBufferHeight / 10)*9), Color.Black);
                     break;
                 case 1: // Starting Animation
                     break;

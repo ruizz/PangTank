@@ -106,7 +106,7 @@ namespace PangTang
                  (int)positions[which].X,
                  (int)positions[which].Y + texture[0].Height,
                  texture[0].Width,
-                 texture[0].Height / 10);
+                 texture[0].Height / 2);
 
                 if (funnelMouth.Intersects(waterLocation))
                 {
