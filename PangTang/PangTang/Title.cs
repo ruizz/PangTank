@@ -54,6 +54,24 @@ namespace PangTang
             tankPosition.Y += windowAreaRectangle.Y;
         }
 
+        /*
+         * Returns
+         */
+
+        public Vector2 getTankPosition()
+        {
+            return tankPosition;
+        }
+
+        public int getTankWidth()
+        {
+            return tankTexture[0].Bounds.Width;
+        }
+
+        public int getTankHeight()
+        {
+            return tankTexture[0].Bounds.Height;
+        }
 
         /*
          * Voids

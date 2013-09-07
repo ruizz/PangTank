@@ -250,7 +250,11 @@ namespace PangTang
                     mouseState = Mouse.GetState();
                     gamePadState = GamePad.GetState(PlayerIndex.One);
                     
-                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    if ((mouseState.LeftButton == ButtonState.Pressed) && 
+                         mouseState.X > title.getTankPosition().X &&
+                         mouseState.X < title.getTankPosition().X + title.getTankWidth() &&
+                         mouseState.Y > title.getTankPosition().Y &&
+                         mouseState.Y < title.getTankPosition().Y + title.getTankHeight())
                     {
                         this.IsMouseVisible = false;
                         musicInstance.Stop();
