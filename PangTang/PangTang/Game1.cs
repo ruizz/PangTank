@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System.Xml.Serialization;
 
 
 
@@ -31,6 +32,7 @@ namespace PangTang
         Funnel funnel; // Funnel for the game.
         Water water; // Water drops for the game.
         Tank tank; // Tank for the game.
+        HighScores highScores; // High scores for the game.
 
         Border border; // Border between tank and play area
 
@@ -80,6 +82,8 @@ namespace PangTang
         int levelDropRequirement; // Drops required to compelete level. +5 drops for each level.
         int levelDropsCaught; // Number of drops caught in the level.
         float speedMultiplier; // How much to speed up the game by whenever level changes.
+
+        string highScoresList; // The high scores for the game
 
         /*
          * Fonts
@@ -344,8 +348,28 @@ namespace PangTang
                     base.Update(gameTime);
                     break;
                 case 3: // Game Ended
+
+                    mouseState = Mouse.GetState();
+                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    {
+                        highScores = new HighScores(totalDropsCaught);
+                        gameState = 4;
+                    }
                     break;
                 case 4: // High Scores
+                    this.IsMouseVisible = true;
+                    //keyboardState = Keyboard.GetState();
+                    mouseState = Mouse.GetState();
+                    gamePadState = GamePad.GetState(PlayerIndex.One);
+
+                    if ((mouseState.LeftButton == ButtonState.Pressed) &&
+                         mouseState.X > 100 &&
+                         mouseState.X < 200 &&
+                         mouseState.Y > 400 &&
+                         mouseState.Y < 450)
+                    {
+                        gameState = 0;
+                    }
                     break;
             }
         }
@@ -387,10 +411,12 @@ namespace PangTang
                     FadeIn.Draw(blackTexture, spriteBatch, windowAreaRectangle);
                     break;
                 case 3: // Game Ended
-                    
+                    spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
                     DrawText();
                     break;
                 case 4: // High Scores
+                    spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
+                    DrawText();
                     break;
             }
 
@@ -418,6 +444,10 @@ namespace PangTang
                     spriteBatch.DrawString(dropsCaughtFont, "Your Score: " + totalDropsCaught, new Vector2(350, 200), Color.Black);
                     break;
                 case 4: // High Scores
+                    highScoresList = highScores.makeHighScoreString();
+                    spriteBatch.DrawString(dropsCaughtFont, "High Scores:", new Vector2(200, 50), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, highScoresList, new Vector2(200, 80), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, "Retry?", new Vector2(100, 400), Color.Black);
                     break;
             }
         }
