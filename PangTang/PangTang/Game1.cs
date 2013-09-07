@@ -34,10 +34,12 @@ namespace PangTang
 
         Border border; // Border between tank and play area
 
+        Rectangle windowAreaRectangle; // Describes the entire window.
         Rectangle playAreaRectangle; // Describes playing area.
         Rectangle tankAreaRectangle; // Describes the fish tank area.
 
         Texture2D backgroundTexture; // Background during gameplay.
+        Texture2D blackTexture; // Used as a black screen.
         
         /*
          * Audio
@@ -95,6 +97,13 @@ namespace PangTang
             graphics.PreferredBackBufferWidth = 900;
             graphics.PreferredBackBufferHeight = 500;
 
+            // Window area rectangle.
+            windowAreaRectangle = new Rectangle(
+                tankAreaRectangle.Width,
+                0,
+                graphics.PreferredBackBufferWidth,
+                graphics.PreferredBackBufferHeight);
+
             // Fish tank area. Takes up 300 px of the left side of the screen.
             tankAreaRectangle = new Rectangle(
                 0,
@@ -146,8 +155,9 @@ namespace PangTang
 
             // TODO: use this.Content to load your game content here
 
-            // Assigning the background that is used during gameplay.
+            // Assigning the black screen and background that is used during gameplay.
             backgroundTexture = Content.Load<Texture2D>("background_game");
+            blackTexture = Content.Load<Texture2D>("background_black");
 
             // Temporary texture for loading textures. e.g. The title logo
             Texture2D tempTexture;
@@ -180,10 +190,10 @@ namespace PangTang
             tempTextureArray[1] = Content.Load<Texture2D>("tank_1_1");
             tempTextureArray[2] = Content.Load<Texture2D>("tank_1_2");
             //new Title(tempTexture, tempTextureArray, "backgroundTexture", new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
-            title = new Title(tempTextureBackground, tempTexture, tempTextureArray, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
+            title = new Title(tempTextureBackground, tempTexture, tempTextureArray, windowAreaRectangle);
 
             // Load starting animation textures
-            startingAnimation = new StartingAnimation(new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), startingVideo);
+            startingAnimation = new StartingAnimation(windowAreaRectangle, startingVideo);
 
             // Load the nozzle texture
             tempTextureArray = new Texture2D[3];
@@ -284,6 +294,10 @@ namespace PangTang
                     if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                         this.Exit();
 
+                    // Take care of the fade from black first
+                    if (!FadeIn.IsFadeCompleted())
+                        break;
+
                     // Update all objects to new positions
                     funnel.Update();
                     nozzle.Update();
@@ -369,6 +383,8 @@ namespace PangTang
                     tank.Draw(spriteBatch);
 
                     DrawText();
+
+                    FadeIn.Draw(blackTexture, spriteBatch, windowAreaRectangle);
                     break;
                 case 3: // Game Ended
                     
@@ -412,6 +428,64 @@ namespace PangTang
             // Set funnel in start position
             funnel.SetInStartPosition();
             nozzle.SetInStartPosition();
+        }
+
+        
+
+        private class FadeIn
+        {
+            private static int currentFrame = 255;
+            private static bool fadeCompleted = false;
+
+            public static void Draw(Texture2D blackTexture, SpriteBatch spriteBatch, Rectangle windowAreaRectangle)
+            {
+                if (currentFrame > 0)
+                {
+                    spriteBatch.Draw(blackTexture, windowAreaRectangle, new Color(255, 255, 255, currentFrame));
+                    currentFrame -= 8;
+                }
+                else
+                    fadeCompleted = true;
+            }
+
+            public static bool IsFadeCompleted()
+            {
+                return fadeCompleted;
+            }
+
+            public static void Reset()
+            {
+                fadeCompleted = false;
+                currentFrame = 255;
+            }
+        }
+
+        private class FadeOut
+        {
+            private static int currentFrame = 0;
+            private static bool fadeCompleted = false;
+
+            public static void Draw(Texture2D blackTexture, SpriteBatch spriteBatch, Rectangle windowAreaRectangle)
+            {
+                if (currentFrame < 255)
+                {
+                    spriteBatch.Draw(blackTexture, windowAreaRectangle, new Color(255, 255, 255, currentFrame));
+                    currentFrame += 8;
+                }
+                else
+                    fadeCompleted = true;
+            }
+
+            public static bool IsFadeCompleted()
+            {
+                return fadeCompleted;
+            }
+
+            public static void Reset()
+            {
+                fadeCompleted = false;
+                currentFrame = 0;
+            }
         }
 
         // End of game1
