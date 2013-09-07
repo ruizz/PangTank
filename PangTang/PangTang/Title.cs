@@ -33,20 +33,19 @@ namespace PangTang
         /*
          * Constructor
          */
-        //public Title(Texture2D logoTexture, Texture2D[] tankTexture, Texture2D backgroundTexture, Rectangle windowAreaRectangle)
-        public Title(Texture2D logoTexture, Texture2D[] tankTexture, Rectangle windowAreaRectangle)
+        public Title(Texture2D backgroundTexture,Texture2D logoTexture, Texture2D[] tankTexture, Rectangle windowAreaRectangle)
         {
             // Establish the logo, tank, and background textures and the window area
             this.logoTexture = logoTexture;
             this.tankTexture = tankTexture;
-            // this.backgroundTexture = backgroundTexture;
+            this.backgroundTexture = backgroundTexture;
             textureStage = 0;
             this.windowAreaRectangle = windowAreaRectangle;
 
             // Positioning the logo
             logoPosition.X = windowAreaRectangle.Width / 2;
             logoPosition.X -= logoTexture.Width / 2;
-            logoPosition.Y = windowAreaRectangle.Height / 10;
+            logoPosition.Y = windowAreaRectangle.Height / 30;
 
             // Positioning the tank
             tankPosition.X = (windowAreaRectangle.Width - tankTexture[0].Width) / 2;
@@ -66,6 +65,7 @@ namespace PangTang
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
             spriteBatch.Draw(logoTexture, logoPosition, Color.White);
 
             if (textureStage <= 4) // Draw first sprite.

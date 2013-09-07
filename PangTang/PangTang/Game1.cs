@@ -35,7 +35,17 @@ namespace PangTang
 
         Rectangle playAreaRectangle; // Describes playing area.
         Rectangle tankAreaRectangle; // Describes the fish tank area.
+
+        Texture2D backgroundTexture; // Background during gameplay.
         
+        /*
+         * Audio
+         */
+        // Using SoundEffect instead of Song for seamless loops.
+        SoundEffect titleMusic;
+        SoundEffect gameplayMusic;
+        SoundEffectInstance musicInstance;
+
         /*
          * States
          */
@@ -135,8 +145,14 @@ namespace PangTang
 
             // TODO: use this.Content to load your game content here
 
+            // Assigning the background that is used during gameplay.
+            backgroundTexture = Content.Load<Texture2D>("background_game");
+
             // Temporary texture for loading textures. e.g. The title logo
             Texture2D tempTexture;
+
+            // Temporary texture for loading the background. (Used by Title class.)
+            Texture2D tempTextureBackground;
 
             // Temporary texture for loading textures that are animated. In this case the funnel, nozzle, etc.
             Texture2D[] tempTextureArray;
@@ -144,15 +160,16 @@ namespace PangTang
             // Same as tempTexture, but this one is used for the tank.
             Texture2D[,] tempTexture2DArray;
 
-            // Load title texture
+            // Load title textures
             tempTexture = Content.Load<Texture2D>("title");
+            tempTextureBackground = Content.Load<Texture2D>("background_title");
 
             tempTextureArray = new Texture2D[3];
             tempTextureArray[0] = Content.Load<Texture2D>("tank_1_0");
             tempTextureArray[1] = Content.Load<Texture2D>("tank_1_1");
             tempTextureArray[2] = Content.Load<Texture2D>("tank_1_2");
             //new Title(tempTexture, tempTextureArray, "backgroundTexture", new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
-            title = new Title(tempTexture, tempTextureArray, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
+            title = new Title(tempTextureBackground, tempTexture, tempTextureArray, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
 
             // Load the nozzle texture
             tempTextureArray = new Texture2D[3];
@@ -199,6 +216,13 @@ namespace PangTang
             tempTextureArray[0] = Content.Load<Texture2D>("tempBorder");
             border = new Border(tempTextureArray[0], playAreaRectangle);
 
+            // Load Music
+            titleMusic = Content.Load<SoundEffect>("titleMusic");
+            gameplayMusic = Content.Load<SoundEffect>("gameplayMusic");
+            musicInstance = titleMusic.CreateInstance();
+            musicInstance.IsLooped = true;
+            musicInstance.Play();
+
             StartGame();
         }
 
@@ -225,10 +249,14 @@ namespace PangTang
                     //keyboardState = Keyboard.GetState();
                     mouseState = Mouse.GetState();
                     gamePadState = GamePad.GetState(PlayerIndex.One);
-                    //if (keyboardState.IsKeyDown(Keys.S))
+                    
                     if (mouseState.LeftButton == ButtonState.Pressed)
                     {
                         this.IsMouseVisible = false;
+                        musicInstance.Stop();
+                        musicInstance = gameplayMusic.CreateInstance();
+                        musicInstance.IsLooped = true;
+                        musicInstance.Play();
                         gameState = 2;
                     }
                     break;
@@ -317,6 +345,9 @@ namespace PangTang
                 case 2: // Game Started
                     spriteBatch.Begin();
 
+                    // Drawing the background first.
+                    spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
+
                     funnel.Draw(spriteBatch);
                     nozzle.Draw(spriteBatch);
                     water.Draw(spriteBatch);
@@ -349,7 +380,7 @@ namespace PangTang
             switch (gameState)
             {
                 case 0: // Title Screen
-                    spriteBatch.DrawString(dropsCaughtFont, "Click to start.", new Vector2(350, (graphics.PreferredBackBufferHeight / 10)*9), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, "Click to start.", new Vector2(375, (graphics.PreferredBackBufferHeight / 10)*9), Color.Black);
                     break;
                 case 1: // Starting Animation
                     break;
