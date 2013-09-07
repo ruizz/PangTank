@@ -26,6 +26,7 @@ namespace PangTang
         SpriteBatch spriteBatch;
 
         Title title; // Title screen for the game.
+        StartingAnimation startingAnimation; // Starting animation for the game.
         Nozzle nozzle; // Nozzle for the game.
         Funnel funnel; // Funnel for the game.
         Water water; // Water drops for the game.
@@ -44,6 +45,7 @@ namespace PangTang
         // Using SoundEffect instead of Song for seamless loops.
         SoundEffect titleMusic;
         SoundEffect gameplayMusic;
+        Video startingVideo;
         SoundEffectInstance musicInstance;
 
         /*
@@ -59,7 +61,7 @@ namespace PangTang
             HighScores          = 4,
         }
 
-        KeyboardState keyboardState;
+        // KeyboardState keyboardState;
         MouseState mouseState;
         GamePadState gamePadState;
         int gameState;  // The current game state
@@ -81,7 +83,6 @@ namespace PangTang
          * Fonts
          */
         SpriteFont dropsCaughtFont;
-        SpriteFont titleScreenFont;
 
         /*
          * Constructor
@@ -160,6 +161,16 @@ namespace PangTang
             // Same as tempTexture, but this one is used for the tank.
             Texture2D[,] tempTexture2DArray;
 
+            // Load all music
+            titleMusic = Content.Load<SoundEffect>("titleMusic");
+            gameplayMusic = Content.Load<SoundEffect>("gameplayMusic");
+            musicInstance = titleMusic.CreateInstance();
+            musicInstance.IsLooped = true;
+            musicInstance.Play();
+
+            // Load all video
+            startingVideo = Content.Load<Video>("video_startingAnimation");
+
             // Load title textures
             tempTexture = Content.Load<Texture2D>("title");
             tempTextureBackground = Content.Load<Texture2D>("background_title");
@@ -170,6 +181,9 @@ namespace PangTang
             tempTextureArray[2] = Content.Load<Texture2D>("tank_1_2");
             //new Title(tempTexture, tempTextureArray, "backgroundTexture", new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
             title = new Title(tempTextureBackground, tempTexture, tempTextureArray, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
+
+            // Load starting animation textures
+            startingAnimation = new StartingAnimation(new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), startingVideo);
 
             // Load the nozzle texture
             tempTextureArray = new Texture2D[3];
@@ -216,13 +230,6 @@ namespace PangTang
             tempTextureArray[0] = Content.Load<Texture2D>("tempBorder");
             border = new Border(tempTextureArray[0], playAreaRectangle);
 
-            // Load Music
-            titleMusic = Content.Load<SoundEffect>("titleMusic");
-            gameplayMusic = Content.Load<SoundEffect>("gameplayMusic");
-            musicInstance = titleMusic.CreateInstance();
-            musicInstance.IsLooped = true;
-            musicInstance.Play();
-
             StartGame();
         }
 
@@ -258,13 +265,18 @@ namespace PangTang
                     {
                         this.IsMouseVisible = false;
                         musicInstance.Stop();
+                        startingAnimation.Start();
+                        gameState = 1;
+                    }
+                    break;
+                case 1: // Starting animation
+                    if (startingAnimation.isFinished())
+                    {
                         musicInstance = gameplayMusic.CreateInstance();
                         musicInstance.IsLooped = true;
                         musicInstance.Play();
                         gameState = 2;
                     }
-                    break;
-                case 1: // Starting animation
                     break;
                 case 2: // Game Started
 
@@ -330,24 +342,22 @@ namespace PangTang
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.White);
+            GraphicsDevice.Clear(Color.Black);
+            spriteBatch.Begin();
 
             switch (gameState)
             {
                 case 0: // Title Screen
-                    spriteBatch.Begin();
-
+                    
                     title.Draw(spriteBatch);
+
                     DrawText();
-
-                    spriteBatch.End();
-
-                    base.Draw(gameTime);
                     break;
                 case 1: // Starting Animation
+
+                    startingAnimation.Draw(spriteBatch);
                     break;
                 case 2: // Game Started
-                    spriteBatch.Begin();
 
                     // Drawing the background first.
                     spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
@@ -359,23 +369,17 @@ namespace PangTang
                     tank.Draw(spriteBatch);
 
                     DrawText();
-
-                    spriteBatch.End();
-
-                    base.Draw(gameTime);
                     break;
                 case 3: // Game Ended
-                    spriteBatch.Begin();
                     
                     DrawText();
-
-                    spriteBatch.End();
-
-                    base.Draw(gameTime);
                     break;
                 case 4: // High Scores
                     break;
             }
+
+            spriteBatch.End();
+            base.Draw(gameTime);
         }
 
         // Draws all text

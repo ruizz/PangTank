@@ -17,11 +17,6 @@ namespace PangTang
         Vector2 tankPosition;
 
         /*
-         * States
-         */
-        bool gameStarted = false; // true if user clicks on tank.
-
-        /*
          * Other
          */
         Texture2D logoTexture;
@@ -57,7 +52,6 @@ namespace PangTang
         /*
          * Returns
          */
-
         public Vector2 getTankPosition()
         {
             return tankPosition;
@@ -76,11 +70,6 @@ namespace PangTang
         /*
          * Voids
          */
-        public void Update()
-        {
-            // TODO  detect mouse click on on tank. Change gameStarted to true if so.
-        }
-
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
