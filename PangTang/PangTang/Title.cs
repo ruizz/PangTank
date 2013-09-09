@@ -15,56 +15,67 @@ namespace PangTang
          */
         Vector2 logoPosition;
         Vector2 tankPosition;
+        Vector2 startButtonPosition;
 
         /*
          * Other
          */
-        Texture2D logoTexture;
-        Texture2D[] tankTexture;
         Texture2D backgroundTexture;
+        Texture2D logoTexture;
+        Texture2D startButtonTexture;
+        Texture2D[] tankTextures;
         int textureStage;
         Rectangle windowAreaRectangle;
 
         /*
          * Constructor
          */
-        public Title(Texture2D backgroundTexture,Texture2D logoTexture, Texture2D[] tankTexture, Rectangle windowAreaRectangle)
+
+        // Textures for titleTextures
+        // 0 - background
+        // 1 - logo
+        // 2 - start button
+        public Title(Texture2D[] titleTextures, Texture2D[] tankTextures, Rectangle windowAreaRectangle)
         {
-            // Establish the logo, tank, and background textures and the window area
-            this.logoTexture = logoTexture;
-            this.tankTexture = tankTexture;
-            this.backgroundTexture = backgroundTexture;
-            textureStage = 0;
+            // Setting the window area
             this.windowAreaRectangle = windowAreaRectangle;
+
+            // Setting the logo, tank, and start button textures
+            backgroundTexture = titleTextures[0];
+            logoTexture = titleTextures[1];
+            startButtonTexture = titleTextures[2];
+
+            // Setting the tank tank textures
+            this.tankTextures = tankTextures;
+            textureStage = 0;
 
             // Positioning the logo
             logoPosition.X = windowAreaRectangle.Width / 2;
             logoPosition.X -= logoTexture.Width / 2;
             logoPosition.Y = windowAreaRectangle.Height / 30;
 
+            // Positioning the start button
+            startButtonPosition.X = windowAreaRectangle.Width / 2;
+            startButtonPosition.X -= startButtonTexture.Width / 2;
+            startButtonPosition.Y = (windowAreaRectangle.Height / 3) * 2;
+
             // Positioning the tank
-            tankPosition.X = (windowAreaRectangle.Width - tankTexture[0].Width) / 2;
+            tankPosition.X = (windowAreaRectangle.Width - tankTextures[0].Width) / 2;
             tankPosition.X += windowAreaRectangle.X;
-            tankPosition.Y = (windowAreaRectangle.Height - tankTexture[0].Height) / 2;
+            tankPosition.Y = (windowAreaRectangle.Height - tankTextures[0].Height) / 2;
             tankPosition.Y += windowAreaRectangle.Y;
         }
 
         /*
          * Returns
          */
-        public Vector2 getTankPosition()
+        public Rectangle getStartButtonBounds()
         {
-            return tankPosition;
-        }
-
-        public int getTankWidth()
-        {
-            return tankTexture[0].Bounds.Width;
-        }
-
-        public int getTankHeight()
-        {
-            return tankTexture[0].Bounds.Height;
+            return new Rectangle(
+                (int) startButtonPosition.X,
+                (int) startButtonPosition.Y,
+                startButtonTexture.Width,
+                startButtonTexture.Height);
         }
 
         /*
@@ -74,17 +85,18 @@ namespace PangTang
         {
             spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
             spriteBatch.Draw(logoTexture, logoPosition, Color.White);
+            spriteBatch.Draw(startButtonTexture, startButtonPosition, Color.White);
 
             if (textureStage <= 4) // Draw first sprite.
-                spriteBatch.Draw(tankTexture[0], tankPosition, Color.White);
+                spriteBatch.Draw(tankTextures[0], tankPosition, Color.White);
 
 
             if (textureStage > 4 && textureStage <= 8) // Draw second sprite.
-                spriteBatch.Draw(tankTexture[1], tankPosition, Color.White);
+                spriteBatch.Draw(tankTextures[1], tankPosition, Color.White);
 
             if (textureStage > 8) // Draw third sprite.
             {
-                spriteBatch.Draw(tankTexture[2], tankPosition, Color.White);
+                spriteBatch.Draw(tankTextures[2], tankPosition, Color.White);
 
                 // Reset the texture stage once the third sprite finishes animating.
                 if (textureStage >= 12)

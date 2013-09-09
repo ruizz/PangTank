@@ -20,14 +20,15 @@ namespace PangTang
     /// </summary>
     public class Game1 : Microsoft.Xna.Framework.Game
     {
-        /*
-         * Objects
-         */
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
+        /*
+         * Game Objects
+         */
         Title title; // Title screen for the game.
-        StartingAnimation startingAnimation; // Starting animation for the game.
+        VideoAnimation startingAnimation; // Starting animation for the game.
+        VideoAnimation endingAnimation; // Ending animation for the game.
         Nozzle nozzle; // Nozzle for the game.
         Funnel funnel; // Funnel for the game.
         Water water; // Water drops for the game.
@@ -50,6 +51,7 @@ namespace PangTang
         SoundEffect titleMusic;
         SoundEffect gameplayMusic;
         Video startingVideo;
+        Video endingVideo;
         SoundEffectInstance musicInstance;
 
         /*
@@ -83,7 +85,11 @@ namespace PangTang
         int levelDropsCaught; // Number of drops caught in the level.
         float speedMultiplier; // How much to speed up the game by whenever level changes.
 
+        /*
+         * High Scores
+         */
         string highScoresList; // The high scores for the game
+        Texture2D highScoresTitle; // Because we can.
 
         /*
          * Fonts
@@ -108,11 +114,11 @@ namespace PangTang
                 graphics.PreferredBackBufferWidth,
                 graphics.PreferredBackBufferHeight);
 
-            // Fish tank area. Takes up 300 px of the left side of the screen.
+            // Fish tank area. Takes up 350 px of the left side of the screen.
             tankAreaRectangle = new Rectangle(
                 0,
                 0,
-                300,
+                350,
                 graphics.PreferredBackBufferHeight);
 
             // Play area. Takes up whatever the fish tank area doesn't.
@@ -163,14 +169,9 @@ namespace PangTang
             backgroundTexture = Content.Load<Texture2D>("background_game");
             blackTexture = Content.Load<Texture2D>("background_black");
 
-            // Temporary texture for loading textures. e.g. The title logo
-            Texture2D tempTexture;
-
-            // Temporary texture for loading the background. (Used by Title class.)
-            Texture2D tempTextureBackground;
-
-            // Temporary texture for loading textures that are animated. In this case the funnel, nozzle, etc.
+            // Temporary texture arrays for loading batches of textures or textures that are animated. 
             Texture2D[] tempTextureArray;
+            Texture2D[] tempTextureArray2;
 
             // Same as tempTexture, but this one is used for the tank.
             Texture2D[,] tempTexture2DArray;
@@ -184,20 +185,24 @@ namespace PangTang
 
             // Load all video
             startingVideo = Content.Load<Video>("video_startingAnimation");
+            endingVideo = Content.Load<Video>("video_endingAnimation");
 
             // Load title textures
-            tempTexture = Content.Load<Texture2D>("title");
-            tempTextureBackground = Content.Load<Texture2D>("background_title");
-
             tempTextureArray = new Texture2D[3];
-            tempTextureArray[0] = Content.Load<Texture2D>("tank_1_0");
-            tempTextureArray[1] = Content.Load<Texture2D>("tank_1_1");
-            tempTextureArray[2] = Content.Load<Texture2D>("tank_1_2");
-            //new Title(tempTexture, tempTextureArray, "backgroundTexture", new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
-            title = new Title(tempTextureBackground, tempTexture, tempTextureArray, windowAreaRectangle);
+            tempTextureArray[0] = Content.Load<Texture2D>("background_title");
+            tempTextureArray[1] = Content.Load<Texture2D>("title");
+            tempTextureArray[2] = Content.Load<Texture2D>("button_start");
 
-            // Load starting animation textures
-            startingAnimation = new StartingAnimation(windowAreaRectangle, startingVideo);
+            tempTextureArray2 = new Texture2D[3];
+            tempTextureArray2[0] = Content.Load<Texture2D>("title_tank_0");
+            tempTextureArray2[1] = Content.Load<Texture2D>("title_tank_1");
+            tempTextureArray2[2] = Content.Load<Texture2D>("title_tank_2");
+            //new Title(tempTexture, tempTextureArray, "backgroundTexture", new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
+            title = new Title(tempTextureArray, tempTextureArray2, windowAreaRectangle);
+
+            // Load starting and ending animation objects
+            startingAnimation = new VideoAnimation(windowAreaRectangle, startingVideo);
+            endingAnimation = new VideoAnimation(windowAreaRectangle, endingVideo);
 
             // Load the nozzle texture
             tempTextureArray = new Texture2D[3];
@@ -240,9 +245,13 @@ namespace PangTang
             dropsCaughtFont = Content.Load<SpriteFont>("dropsCaughtFont");
 
             // Load Border
-            tempTextureArray = new Texture2D[1];
-            tempTextureArray[0] = Content.Load<Texture2D>("tempBorder");
-            border = new Border(tempTextureArray[0], playAreaRectangle);
+            tempTextureArray = new Texture2D[2];
+            tempTextureArray[0] = Content.Load<Texture2D>("divider_0");
+            tempTextureArray[1] = Content.Load<Texture2D>("hoseEnd_0");
+            border = new Border(tempTextureArray, playAreaRectangle);
+
+            // Load High Scores title
+            highScoresTitle = Content.Load<Texture2D>("title_highScores");
 
             StartGame();
         }
@@ -267,15 +276,14 @@ namespace PangTang
             {
                 case 0: // Title screen
                     this.IsMouseVisible = true;
-                    //keyboardState = Keyboard.GetState();
                     mouseState = Mouse.GetState();
                     gamePadState = GamePad.GetState(PlayerIndex.One);
                     
-                    if ((mouseState.LeftButton == ButtonState.Pressed) && 
-                         mouseState.X > title.getTankPosition().X &&
-                         mouseState.X < title.getTankPosition().X + title.getTankWidth() &&
-                         mouseState.Y > title.getTankPosition().Y &&
-                         mouseState.Y < title.getTankPosition().Y + title.getTankHeight())
+                    if ((mouseState.LeftButton == ButtonState.Pressed) &&
+                         mouseState.X > title.getStartButtonBounds().X &&
+                         mouseState.X < title.getStartButtonBounds().X + title.getStartButtonBounds().Width &&
+                         mouseState.Y > title.getStartButtonBounds().Y &&
+                         mouseState.Y < title.getStartButtonBounds().Y + title.getStartButtonBounds().Height)
                     {
                         this.IsMouseVisible = false;
                         musicInstance.Stop();
@@ -291,6 +299,7 @@ namespace PangTang
                         musicInstance.Play();
                         gameState = 2;
                     }
+
                     break;
                 case 2: // Game Started
 
@@ -342,16 +351,21 @@ namespace PangTang
                     }
 
                     // Game Over
-                    if (tank.getTankLevel() == 3) 
+                    if (tank.getTankLevel() == 3)
+                    {
+                        musicInstance.Stop();
+                        endingAnimation.Start();
                         gameState = 3;
+                    }
 
                     base.Update(gameTime);
                     break;
                 case 3: // Game Ended
 
-                    mouseState = Mouse.GetState();
-                    if (mouseState.LeftButton == ButtonState.Pressed)
+                    if (endingAnimation.isFinished())
                     {
+                        FadeIn.Reset();
+                        musicInstance.Play();
                         highScores = new HighScores(totalDropsCaught);
                         gameState = 4;
                     }
@@ -410,13 +424,15 @@ namespace PangTang
 
                     FadeIn.Draw(blackTexture, spriteBatch, windowAreaRectangle);
                     break;
-                case 3: // Game Ended
-                    spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
-                    DrawText();
+                case 3: // Ending Animation
+
+                    endingAnimation.Draw(spriteBatch);
                     break;
                 case 4: // High Scores
                     spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
                     DrawText();
+
+                    FadeIn.Draw(blackTexture, spriteBatch, windowAreaRectangle);
                     break;
             }
 
@@ -430,7 +446,6 @@ namespace PangTang
             switch (gameState)
             {
                 case 0: // Title Screen
-                    spriteBatch.DrawString(dropsCaughtFont, "Click to start.", new Vector2(375, (graphics.PreferredBackBufferHeight / 10)*9), Color.Black);
                     break;
                 case 1: // Starting Animation
                     break;
@@ -439,13 +454,11 @@ namespace PangTang
                     spriteBatch.DrawString(dropsCaughtFont, "Level Drops Caught: " + levelDropsCaught, new Vector2(20, 50), Color.Black);
                     spriteBatch.DrawString(dropsCaughtFont, "Total Drops Caught: " + totalDropsCaught, new Vector2(20, 80), Color.Black);
                     break;
-                case 3: // Game Ended
-                    spriteBatch.DrawString(dropsCaughtFont, "Game Over", new Vector2(350, 100), Color.Black);
-                    spriteBatch.DrawString(dropsCaughtFont, "Your Score: " + totalDropsCaught, new Vector2(350, 200), Color.Black);
+                case 3: // Ending Animation
                     break;
                 case 4: // High Scores
                     highScoresList = highScores.makeHighScoreString();
-                    spriteBatch.DrawString(dropsCaughtFont, "High Scores:", new Vector2(200, 50), Color.Black);
+                    spriteBatch.Draw(highScoresTitle, new Vector2((windowAreaRectangle.Width / 2) - (highScoresTitle.Width / 2), windowAreaRectangle.Height / 30), Color.White);
                     spriteBatch.DrawString(dropsCaughtFont, highScoresList, new Vector2(200, 80), Color.Black);
                     spriteBatch.DrawString(dropsCaughtFont, "Retry?", new Vector2(100, 400), Color.Black);
                     break;
@@ -487,34 +500,6 @@ namespace PangTang
             {
                 fadeCompleted = false;
                 currentFrame = 255;
-            }
-        }
-
-        private class FadeOut
-        {
-            private static int currentFrame = 0;
-            private static bool fadeCompleted = false;
-
-            public static void Draw(Texture2D blackTexture, SpriteBatch spriteBatch, Rectangle windowAreaRectangle)
-            {
-                if (currentFrame < 255)
-                {
-                    spriteBatch.Draw(blackTexture, windowAreaRectangle, new Color(255, 255, 255, currentFrame));
-                    currentFrame += 8;
-                }
-                else
-                    fadeCompleted = true;
-            }
-
-            public static bool IsFadeCompleted()
-            {
-                return fadeCompleted;
-            }
-
-            public static void Reset()
-            {
-                fadeCompleted = false;
-                currentFrame = 0;
             }
         }
 

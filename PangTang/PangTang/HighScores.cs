@@ -112,7 +112,7 @@ namespace PangTang
             HighScoreData data2 = LoadHighScores(HighScoresFilename);
 
             // Create scoreBoardString
-            string scoreBoardString = "Highscores:\n\n";
+            string scoreBoardString = "\n\n";
 
             for (int i = 4; i >= 0; i--) // this part was missing (5 means how many in the list/array/Counter)
             {

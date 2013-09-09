@@ -109,7 +109,7 @@
   <ItemGroup>
     <Compile Include="Border.cs" />
     <Compile Include="HighScores.cs" />
-    <Compile Include="StartingAnimation.cs" />
+    <Compile Include="VideoAnimation.cs" />
     <Compile Include="Tank.cs" />
     <Compile Include="Title.cs" />
     <Compile Include="Water.cs" />

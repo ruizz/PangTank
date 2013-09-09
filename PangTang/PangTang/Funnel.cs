@@ -51,8 +51,8 @@ namespace PangTang
         public Rectangle GetBounds()
         {
             return new Rectangle(
-             (int)position.X,
-             (int)position.Y,
+             (int) position.X,
+             (int) position.Y,
              texture[0].Width,
              texture[0].Height);
         }
@@ -61,8 +61,8 @@ namespace PangTang
         public Rectangle GetCollisionBounds()
         {
             return new Rectangle(
-             (int)position.X,
-             (int)position.Y,
+             (int) position.X,
+             (int) position.Y,
              texture[0].Width,
              texture[0].Height / 10);
         }

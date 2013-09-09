@@ -10,13 +10,16 @@ using Microsoft.Xna.Framework.Media;
 
 namespace PangTang
 {
-    class StartingAnimation
+    class VideoAnimation
     {
         /*
          * Positions
          */
         Rectangle windowAreaRectangle;
 
+        /*
+         * Status
+         */
         bool animationFinished = false;
 
         Video video;
@@ -25,7 +28,7 @@ namespace PangTang
         /*
          * Constructor
          */
-        public StartingAnimation(Rectangle windowAreaRectangle, Video video)
+        public VideoAnimation(Rectangle windowAreaRectangle, Video video)
         {
             this.windowAreaRectangle = windowAreaRectangle;
             this.video = video;

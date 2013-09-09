@@ -1,5 +1,4 @@
 Content\dropsCaughtFont.xnb
-Content\tempBorder.xnb
 Content\funnel_0.xnb
 Content\funnel_1.xnb
 Content\funnel_2.xnb
@@ -21,8 +20,17 @@ Content\nozzle_0.xnb
 Content\title.xnb
 Content\background_game.xnb
 Content\background_title.xnb
-Content\background_black.xnb
 Content\titleMusic.xnb
 Content\gameplayMusic.xnb
+Content\background_black.xnb
 Content\video_startingAnimation.xnb
+Content\title_tank_0.xnb
+Content\title_tank_1.xnb
+Content\title_tank_2.xnb
+Content\button_start.xnb
+Content\divider_0.xnb
+Content\video_endingAnimation.xnb
+Content\hoseEnd_0.xnb
+Content\title_highScores.xnb
 Content\video_startingAnimation.wmv
+Content\video_endingAnimation.wmv
