@@ -292,7 +292,8 @@ namespace PangTang
                     }
                     break;
                 case 1: // Starting animation
-                    if (startingAnimation.isFinished())
+                    mouseState = Mouse.GetState();
+                    if (startingAnimation.isFinished() || mouseState.LeftButton == ButtonState.Pressed )
                     {
                         musicInstance = gameplayMusic.CreateInstance();
                         musicInstance.IsLooped = true;
@@ -459,7 +460,7 @@ namespace PangTang
                 case 4: // High Scores
                     highScoresList = highScores.makeHighScoreString();
                     spriteBatch.Draw(highScoresTitle, new Vector2((windowAreaRectangle.Width / 2) - (highScoresTitle.Width / 2), windowAreaRectangle.Height / 30), Color.White);
-                    spriteBatch.DrawString(dropsCaughtFont, highScoresList, new Vector2(200, 80), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, highScoresList, new Vector2((windowAreaRectangle.Width / 2)-75, (windowAreaRectangle.Height / 30) + 150), Color.Black);
                     spriteBatch.DrawString(dropsCaughtFont, "Retry?", new Vector2(100, 400), Color.Black);
                     break;
             }

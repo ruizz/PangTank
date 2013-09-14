@@ -114,10 +114,14 @@ namespace PangTang
             // Create scoreBoardString
             string scoreBoardString = "\n\n";
 
-            for (int i = 4; i >= 0; i--) // this part was missing (5 means how many in the list/array/Counter)
-            {
-                scoreBoardString = scoreBoardString + data2.Score[i] + "\n";
-            }
+            //for (int i = 4; i >= 0; i--) // this part was missing (5 means how many in the list/array/Counter)
+            //{
+            //    scoreBoardString = scoreBoardString + data2.Score[i] + "\n";
+            //}
+
+            scoreBoardString = "1st: " + data2.Score[4] + "\n2nd: " + data2.Score[3] +
+                               "\n3rd: " + data2.Score[2] + "\n4th: " + data2.Score[1] +
+                               "\n5th: " + data2.Score[0];
 
             return scoreBoardString;
         }
