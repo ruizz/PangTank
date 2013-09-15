@@ -52,6 +52,11 @@ namespace PangTang
             videoPlayer.Play(video);
         }
 
+        public void Stop()
+        {
+            videoPlayer.Stop();
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             if (videoPlayer.State != MediaState.Stopped)

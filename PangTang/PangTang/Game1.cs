@@ -76,7 +76,6 @@ namespace PangTang
         /*
          * Status
          */
-
         double waterInterval; // Interval water drops to come out of nozzle.
         double seconds; // Seconds elapsed. Uses XNA's GameTime
         int totalDropsCaught; // Total drops caught.
@@ -293,8 +292,9 @@ namespace PangTang
                     break;
                 case 1: // Starting animation
                     mouseState = Mouse.GetState();
-                    if (startingAnimation.isFinished() || mouseState.LeftButton == ButtonState.Pressed )
+                    if (startingAnimation.isFinished() || mouseState.LeftButton == ButtonState.Pressed)
                     {
+                        startingAnimation.Stop();
                         musicInstance = gameplayMusic.CreateInstance();
                         musicInstance.IsLooped = true;
                         musicInstance.Play();
@@ -309,7 +309,10 @@ namespace PangTang
                         this.Exit();
 
                     // Take care of the fade from black first
-                    if (!FadeIn.IsFadeCompleted())
+                    if (!FadeInAnimation.IsFadeCompleted())
+                        break;
+
+                    if (!LevelChangeAnimation.IsAnimationCompleted())
                         break;
 
                     // Update all objects to new positions
@@ -349,6 +352,8 @@ namespace PangTang
                         // Decrease the multiplier so that the speed increases per level don't become drastic.
                         if (speedMultiplier > 1.0f)
                             speedMultiplier *= 0.98f;
+
+                        LevelChangeAnimation.Reset();
                     }
 
                     // Game Over
@@ -363,9 +368,11 @@ namespace PangTang
                     break;
                 case 3: // Game Ended
 
-                    if (endingAnimation.isFinished())
+                    mouseState = Mouse.GetState();
+                    if (endingAnimation.isFinished() || mouseState.LeftButton == ButtonState.Pressed)
                     {
-                        FadeIn.Reset();
+                        endingAnimation.Stop();
+                        FadeInAnimation.Reset();
                         musicInstance.Play();
                         highScores = new HighScores(totalDropsCaught);
                         gameState = 4;
@@ -423,7 +430,12 @@ namespace PangTang
 
                     DrawText();
 
-                    FadeIn.Draw(blackTexture, spriteBatch, windowAreaRectangle);
+                    FadeInAnimation.Draw(blackTexture, spriteBatch, windowAreaRectangle);
+
+                    if (FadeInAnimation.IsFadeCompleted())
+                    {
+                        LevelChangeAnimation.Draw(spriteBatch, dropsCaughtFont, currentLevel);
+                    }
                     break;
                 case 3: // Ending Animation
 
@@ -433,7 +445,7 @@ namespace PangTang
                     spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
                     DrawText();
 
-                    FadeIn.Draw(blackTexture, spriteBatch, windowAreaRectangle);
+                    FadeInAnimation.Draw(blackTexture, spriteBatch, windowAreaRectangle);
                     break;
             }
 
@@ -474,9 +486,7 @@ namespace PangTang
             nozzle.SetInStartPosition();
         }
 
-        
-
-        private class FadeIn
+        private class FadeInAnimation
         {
             private static int currentFrame = 255;
             private static bool fadeCompleted = false;
@@ -501,6 +511,35 @@ namespace PangTang
             {
                 fadeCompleted = false;
                 currentFrame = 255;
+            }
+        }
+
+        private class LevelChangeAnimation
+        {
+            private static int currentFrame = 600;
+            private static bool animationCompleted = false;
+
+            public static void Draw(SpriteBatch spriteBatch, SpriteFont spriteFont, int level)
+            {
+                if (currentFrame > 0)
+                {
+                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(400, 230), Color.Black);
+                    currentFrame -= 8;
+                }
+                else
+                    animationCompleted = true;
+                
+            }
+
+            public static bool IsAnimationCompleted()
+            {
+                return animationCompleted;
+            }
+
+            public static void Reset()
+            {
+                animationCompleted = false;
+                currentFrame = 600;
             }
         }
 
