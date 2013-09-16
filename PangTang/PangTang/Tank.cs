@@ -80,15 +80,12 @@ namespace PangTang
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            if (textureStage <= 4) // Draw first sprite.
+            if (textureStage <= 6) // Draw first sprite.
                 spriteBatch.Draw(texture[getTankLevel(), 0], position, Color.White);
 
-            if (textureStage > 4 && textureStage <= 8) // Draw second sprite.
-                spriteBatch.Draw(texture[getTankLevel(), 1], position, Color.White);
-
-            if (textureStage > 8) // Draw third sprite.
+            if (textureStage > 6) // Draw second sprite.
             {
-                spriteBatch.Draw(texture[getTankLevel(), 2], position, Color.White);
+                spriteBatch.Draw(texture[getTankLevel(), 1], position, Color.White);
 
                 // Reset the texture stage once the third sprite finishes animating.
                 if (textureStage >= 12)

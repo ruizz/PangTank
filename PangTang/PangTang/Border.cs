@@ -21,8 +21,13 @@ namespace PangTang
          * Other
          */
         Texture2D borderTexture;
+        Texture2D borderAnimation1;
+        Texture2D borderAnimation2;
+        Texture2D borderAnimation3;
         Texture2D hoseEndTexture;
         Rectangle playAreaRectangle;
+        int totalDropsCaught = 0;
+        int animationFrame = -1;
 
         /*
          * Constructor
@@ -31,15 +36,18 @@ namespace PangTang
         {
             // Establish texture, water width/height, play area, starting speed, and active state.
             borderTexture = textures[0];
-            hoseEndTexture = textures[1];
+            borderAnimation1 = textures[1];
+            borderAnimation2 = textures[2];
+            borderAnimation3 = textures[3];
+            hoseEndTexture = textures[4];
             bounds.Width = borderTexture.Width;
             bounds.Height = borderTexture.Height;
             this.playAreaRectangle = playAreaRectangle;
 
-            borderPosition.X = playAreaRectangle.Left - borderTexture.Width;
+            borderPosition.X = playAreaRectangle.Left - (borderTexture.Width / 1.8f);
             borderPosition.Y = 0;
 
-            hoseEndPosition.X = 40;
+            hoseEndPosition.X = 80;
             hoseEndPosition.Y = 0;
         }
 
@@ -59,9 +67,39 @@ namespace PangTang
          * Voids
          */
 
+        public void Update(int totalDropsCaught)
+        {
+            if (this.totalDropsCaught < totalDropsCaught)
+            {
+                this.totalDropsCaught++;
+                animationFrame++;
+            }
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(borderTexture, borderPosition, Color.White);
+            if(animationFrame == -1)
+                spriteBatch.Draw(borderTexture, borderPosition, Color.White);
+            else if(animationFrame <= 10)
+            {
+                spriteBatch.Draw(borderAnimation1, borderPosition, Color.White);
+                animationFrame++;
+            }
+            else if (animationFrame <= 20)
+            {
+                spriteBatch.Draw(borderAnimation2, borderPosition, Color.White);
+                animationFrame++;
+            }
+            else if (animationFrame <= 30)
+            {
+                spriteBatch.Draw(borderAnimation3, borderPosition, Color.White);
+
+                if (animationFrame == 30)
+                    animationFrame = -1;
+                else
+                    animationFrame++;
+            }
+
             spriteBatch.Draw(hoseEndTexture, hoseEndPosition, Color.White);
         }
     }

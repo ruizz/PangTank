@@ -41,7 +41,8 @@ namespace PangTang
         Rectangle playAreaRectangle; // Describes playing area.
         Rectangle tankAreaRectangle; // Describes the fish tank area.
 
-        Texture2D backgroundTexture; // Background during gameplay.
+        Texture2D gameplayBackgroundTexture; // Background during gameplay.
+        Texture2D titleBackgroundTexture; // Background during title and highscores.
         Texture2D blackTexture; // Used as a black screen.
         
         /*
@@ -49,7 +50,7 @@ namespace PangTang
          */
         // Using SoundEffect instead of Song for seamless loops.
         SoundEffect titleMusic;
-        SoundEffect gameplayMusic;
+        Song gameplayMusic;
         Video startingVideo;
         Video endingVideo;
         SoundEffectInstance musicInstance;
@@ -94,6 +95,7 @@ namespace PangTang
          * Fonts
          */
         SpriteFont dropsCaughtFont;
+        SpriteFont levelFont;
 
         /*
          * Constructor
@@ -165,7 +167,8 @@ namespace PangTang
             // TODO: use this.Content to load your game content here
 
             // Assigning the black screen and background that is used during gameplay.
-            backgroundTexture = Content.Load<Texture2D>("background_game");
+            titleBackgroundTexture = Content.Load<Texture2D>("background_title");
+            gameplayBackgroundTexture = Content.Load<Texture2D>("background_game");
             blackTexture = Content.Load<Texture2D>("background_black");
 
             // Temporary texture arrays for loading batches of textures or textures that are animated. 
@@ -177,7 +180,7 @@ namespace PangTang
 
             // Load all music
             titleMusic = Content.Load<SoundEffect>("titleMusic");
-            gameplayMusic = Content.Load<SoundEffect>("gameplayMusic");
+            gameplayMusic = Content.Load<Song>("gameplayMusic");
             musicInstance = titleMusic.CreateInstance();
             musicInstance.IsLooped = true;
             musicInstance.Play();
@@ -188,15 +191,13 @@ namespace PangTang
 
             // Load title textures
             tempTextureArray = new Texture2D[3];
-            tempTextureArray[0] = Content.Load<Texture2D>("background_title");
+            tempTextureArray[0] = titleBackgroundTexture;
             tempTextureArray[1] = Content.Load<Texture2D>("title");
             tempTextureArray[2] = Content.Load<Texture2D>("button_start");
 
             tempTextureArray2 = new Texture2D[3];
             tempTextureArray2[0] = Content.Load<Texture2D>("title_tank_0");
             tempTextureArray2[1] = Content.Load<Texture2D>("title_tank_1");
-            tempTextureArray2[2] = Content.Load<Texture2D>("title_tank_2");
-            //new Title(tempTexture, tempTextureArray, "backgroundTexture", new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight));
             title = new Title(tempTextureArray, tempTextureArray2, windowAreaRectangle);
 
             // Load starting and ending animation objects
@@ -228,25 +229,26 @@ namespace PangTang
             tempTexture2DArray = new Texture2D[3, 3];
             tempTexture2DArray[0, 0] = Content.Load<Texture2D>("tank_0_0"); 
             tempTexture2DArray[0, 1] = Content.Load<Texture2D>("tank_0_1"); 
-            tempTexture2DArray[0, 2] = Content.Load<Texture2D>("tank_0_2");
 
             tempTexture2DArray[1, 0] = Content.Load<Texture2D>("tank_1_0");
             tempTexture2DArray[1, 1] = Content.Load<Texture2D>("tank_1_1");
-            tempTexture2DArray[1, 2] = Content.Load<Texture2D>("tank_1_2");
 
             tempTexture2DArray[2, 0] = Content.Load<Texture2D>("tank_2_0");
             tempTexture2DArray[2, 1] = Content.Load<Texture2D>("tank_2_1");
-            tempTexture2DArray[2, 2] = Content.Load<Texture2D>("tank_2_2");
 
             tank = new Tank(tempTexture2DArray, tankAreaRectangle);
 
             // Load fonts
             dropsCaughtFont = Content.Load<SpriteFont>("dropsCaughtFont");
+            levelFont = Content.Load<SpriteFont>("levelFont");
 
             // Load Border
-            tempTextureArray = new Texture2D[2];
+            tempTextureArray = new Texture2D[5];
             tempTextureArray[0] = Content.Load<Texture2D>("divider_0");
-            tempTextureArray[1] = Content.Load<Texture2D>("hoseEnd_0");
+            tempTextureArray[1] = Content.Load<Texture2D>("divider_1");
+            tempTextureArray[2] = Content.Load<Texture2D>("divider_2");
+            tempTextureArray[3] = Content.Load<Texture2D>("divider_3");
+            tempTextureArray[4] = Content.Load<Texture2D>("hoseEnd_0");
             border = new Border(tempTextureArray, playAreaRectangle);
 
             // Load High Scores title
@@ -295,9 +297,8 @@ namespace PangTang
                     if (startingAnimation.isFinished() || mouseState.LeftButton == ButtonState.Pressed)
                     {
                         startingAnimation.Stop();
-                        musicInstance = gameplayMusic.CreateInstance();
-                        musicInstance.IsLooped = true;
-                        musicInstance.Play();
+                        MediaPlayer.IsRepeating = true;
+                        MediaPlayer.Play(gameplayMusic);
                         gameState = 2;
                     }
 
@@ -313,12 +314,17 @@ namespace PangTang
                         break;
 
                     if (!LevelChangeAnimation.IsAnimationCompleted())
+                    {
+                        funnel.Update();
+                        border.Update(totalDropsCaught);
                         break;
-
+                    }
+                        
                     // Update all objects to new positions
                     funnel.Update();
                     nozzle.Update();
                     water.Update();
+                    border.Update(totalDropsCaught);
 
                     // Release a drop during every specified interval
                     seconds += gameTime.ElapsedGameTime.TotalSeconds; // seconds += Elapsed time since last update
@@ -359,7 +365,7 @@ namespace PangTang
                     // Game Over
                     if (tank.getTankLevel() == 3)
                     {
-                        musicInstance.Stop();
+                        MediaPlayer.Stop();
                         endingAnimation.Start();
                         gameState = 3;
                     }
@@ -373,7 +379,7 @@ namespace PangTang
                     {
                         endingAnimation.Stop();
                         FadeInAnimation.Reset();
-                        musicInstance.Play();
+                        MediaPlayer.Play(gameplayMusic);
                         highScores = new HighScores(totalDropsCaught);
                         gameState = 4;
                     }
@@ -420,7 +426,7 @@ namespace PangTang
                 case 2: // Game Started
 
                     // Drawing the background first.
-                    spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
+                    spriteBatch.Draw(gameplayBackgroundTexture, new Vector2(0, 0), Color.White);
 
                     funnel.Draw(spriteBatch);
                     nozzle.Draw(spriteBatch);
@@ -434,7 +440,7 @@ namespace PangTang
 
                     if (FadeInAnimation.IsFadeCompleted())
                     {
-                        LevelChangeAnimation.Draw(spriteBatch, dropsCaughtFont, currentLevel);
+                        LevelChangeAnimation.Draw(spriteBatch, levelFont, currentLevel);
                     }
                     break;
                 case 3: // Ending Animation
@@ -442,7 +448,7 @@ namespace PangTang
                     endingAnimation.Draw(spriteBatch);
                     break;
                 case 4: // High Scores
-                    spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
+                    spriteBatch.Draw(titleBackgroundTexture, new Vector2(0, 0), Color.White);
                     DrawText();
 
                     FadeInAnimation.Draw(blackTexture, spriteBatch, windowAreaRectangle);
@@ -523,7 +529,9 @@ namespace PangTang
             {
                 if (currentFrame > 0)
                 {
-                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(400, 230), Color.Black);
+                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(527, 202), Color.Black);
+                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(525, 200), new Color(255, 255, 0));
+                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(524, 199), new Color(28, 22, 101));
                     currentFrame -= 8;
                 }
                 else

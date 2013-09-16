@@ -104,9 +104,9 @@ namespace PangTang
             {
                 Rectangle waterLocation = new Rectangle(
                  (int)positions[which].X,
-                 (int)positions[which].Y + texture[0].Height,
+                 (int)positions[which].Y + (texture[0].Height / 4) * 3,
                  texture[0].Width,
-                 texture[0].Height / 2);
+                 texture[0].Height / 4);
 
                 if (funnelMouth.Intersects(waterLocation))
                 {

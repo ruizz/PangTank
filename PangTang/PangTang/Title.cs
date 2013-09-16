@@ -57,7 +57,7 @@ namespace PangTang
             // Positioning the start button
             startButtonPosition.X = windowAreaRectangle.Width / 2;
             startButtonPosition.X -= startButtonTexture.Width / 2;
-            startButtonPosition.Y = (windowAreaRectangle.Height / 3) * 2;
+            startButtonPosition.Y = (windowAreaRectangle.Height / 5) * 4;
 
             // Positioning the tank
             tankPosition.X = (windowAreaRectangle.Width - tankTextures[0].Width) / 2;
@@ -87,16 +87,13 @@ namespace PangTang
             spriteBatch.Draw(logoTexture, logoPosition, Color.White);
             spriteBatch.Draw(startButtonTexture, startButtonPosition, Color.White);
 
-            if (textureStage <= 4) // Draw first sprite.
+            if (textureStage <= 6) // Draw first sprite.
                 spriteBatch.Draw(tankTextures[0], tankPosition, Color.White);
 
 
-            if (textureStage > 4 && textureStage <= 8) // Draw second sprite.
-                spriteBatch.Draw(tankTextures[1], tankPosition, Color.White);
-
-            if (textureStage > 8) // Draw third sprite.
+            if (textureStage > 6) // Draw second sprite.
             {
-                spriteBatch.Draw(tankTextures[2], tankPosition, Color.White);
+                spriteBatch.Draw(tankTextures[1], tankPosition, Color.White);
 
                 // Reset the texture stage once the third sprite finishes animating.
                 if (textureStage >= 12)
