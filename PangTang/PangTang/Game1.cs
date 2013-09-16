@@ -44,6 +44,8 @@ namespace PangTang
         Texture2D gameplayBackgroundTexture; // Background during gameplay.
         Texture2D titleBackgroundTexture; // Background during title and highscores.
         Texture2D blackTexture; // Used as a black screen.
+
+        Texture2D waterDropUITexture; // Water drople used for the UI.
         
         /*
          * Audio
@@ -170,6 +172,7 @@ namespace PangTang
             titleBackgroundTexture = Content.Load<Texture2D>("background_title");
             gameplayBackgroundTexture = Content.Load<Texture2D>("background_game");
             blackTexture = Content.Load<Texture2D>("background_black");
+            waterDropUITexture = Content.Load<Texture2D>("water_0");
 
             // Temporary texture arrays for loading batches of textures or textures that are animated. 
             Texture2D[] tempTextureArray;
@@ -469,9 +472,22 @@ namespace PangTang
                 case 1: // Starting Animation
                     break;
                 case 2: // Game Started
-                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 20), Color.Black);
-                    spriteBatch.DrawString(dropsCaughtFont, "Level Drops Caught: " + levelDropsCaught, new Vector2(20, 50), Color.Black);
-                    spriteBatch.DrawString(dropsCaughtFont, "Total Drops Caught: " + totalDropsCaught, new Vector2(20, 80), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(19, 15), new Color(236, 166, 32));
+                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(19, 50), new Color(236, 166, 32));
+
+                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(21, 15), new Color(236, 166, 32));
+                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(21, 50), new Color(236, 166, 32));
+
+                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 14), new Color(236, 166, 32));
+                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(20, 49), new Color(236, 166, 32));
+
+                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 16), new Color(236, 166, 32));
+                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(20, 51), new Color(236, 166, 32));
+
+                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 15), new Color(201, 110, 0));
+                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(20, 50), new Color(201, 110, 0));
+
+                    spriteBatch.Draw(waterDropUITexture, new Vector2(73, 50), Color.White);
                     break;
                 case 3: // Ending Animation
                     break;
