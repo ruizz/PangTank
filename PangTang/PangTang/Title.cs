@@ -5,6 +5,7 @@ using System.Text;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace PangTang
 {
@@ -16,6 +17,7 @@ namespace PangTang
         Vector2 logoPosition;
         Vector2 tankPosition;
         Vector2 startButtonPosition;
+        Vector2 muteButtonPosition;
 
         /*
          * Other
@@ -23,9 +25,13 @@ namespace PangTang
         Texture2D backgroundTexture;
         Texture2D logoTexture;
         Texture2D startButtonTexture;
+        Texture2D muteButtonTexture;
         Texture2D[] tankTextures;
         int textureStage;
         Rectangle windowAreaRectangle;
+        Rectangle startButton;
+        Rectangle muteButton;
+        bool buttonHeldDown;
 
         /*
          * Constructor
@@ -44,6 +50,7 @@ namespace PangTang
             backgroundTexture = titleTextures[0];
             logoTexture = titleTextures[1];
             startButtonTexture = titleTextures[2];
+            muteButtonTexture = titleTextures[3];
 
             // Setting the tank tank textures
             this.tankTextures = tankTextures;
@@ -57,25 +64,69 @@ namespace PangTang
             // Positioning the start button
             startButtonPosition.X = windowAreaRectangle.Width / 2;
             startButtonPosition.X -= startButtonTexture.Width / 2;
-            startButtonPosition.Y = (windowAreaRectangle.Height / 5) * 4;
+            startButtonPosition.Y = (windowAreaRectangle.Height / 6) * 5;
+
+            // Positioning the mute button
+            muteButtonPosition.X = windowAreaRectangle.Width / 8;
+            muteButtonPosition.X -= muteButtonTexture.Width / 2;
+            muteButtonPosition.Y = (windowAreaRectangle.Height / 6) * 5;
+
+            // Creating rectangle for start button
+            startButton = new Rectangle((int)startButtonPosition.X, (int)startButtonPosition.Y,
+                startButtonTexture.Width, startButtonTexture.Height);
+
+            muteButton = new Rectangle((int)muteButtonPosition.X, (int)muteButtonPosition.Y,
+                muteButtonTexture.Width, muteButtonTexture.Height);
 
             // Positioning the tank
             tankPosition.X = (windowAreaRectangle.Width - tankTextures[0].Width) / 2;
             tankPosition.X += windowAreaRectangle.X;
             tankPosition.Y = (windowAreaRectangle.Height - tankTextures[0].Height) / 2;
+            tankPosition.Y += 25; // Impromptu fix to conform to the logo change.
             tankPosition.Y += windowAreaRectangle.Y;
+
+            // Setting a flag
+            buttonHeldDown = false;
         }
 
         /*
          * Returns
          */
-        public Rectangle getStartButtonBounds()
+        public bool isStartButtonPressed(MouseState mouseState)
         {
-            return new Rectangle(
-                (int) startButtonPosition.X,
-                (int) startButtonPosition.Y,
-                startButtonTexture.Width,
-                startButtonTexture.Height);
+            if ((mouseState.LeftButton == ButtonState.Pressed) &&
+                         mouseState.X > startButton.X &&
+                         mouseState.X < startButton.X + startButton.Width &&
+                         mouseState.Y > startButton.Y &&
+                         mouseState.Y < startButton.Y + startButton.Height)
+                return true;
+            else
+                return false;
+        }
+
+        public bool isMuteButtonPressed(MouseState mouseState)
+        {
+            if (mouseState.LeftButton == ButtonState.Released)
+            {
+                buttonHeldDown = false;
+                return false;
+            }
+
+            if (buttonHeldDown)
+                return false;
+
+            if (!buttonHeldDown &&
+                        (mouseState.LeftButton == ButtonState.Pressed) &&
+                         mouseState.X > muteButton.X &&
+                         mouseState.X < muteButton.X + muteButton.Width &&
+                         mouseState.Y > muteButton.Y &&
+                         mouseState.Y < muteButton.Y + muteButton.Height)
+            {
+                buttonHeldDown = true;
+                return true;
+            }
+            else
+                return false;
         }
 
         /*
@@ -86,6 +137,7 @@ namespace PangTang
             spriteBatch.Draw(backgroundTexture, new Vector2(0, 0), Color.White);
             spriteBatch.Draw(logoTexture, logoPosition, Color.White);
             spriteBatch.Draw(startButtonTexture, startButtonPosition, Color.White);
+            spriteBatch.Draw(muteButtonTexture, muteButtonPosition, Color.White);
 
             if (textureStage <= 6) // Draw first sprite.
                 spriteBatch.Draw(tankTextures[0], tankPosition, Color.White);

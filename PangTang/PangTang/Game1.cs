@@ -51,11 +51,10 @@ namespace PangTang
          * Audio
          */
         // Using SoundEffect instead of Song for seamless loops.
-        SoundEffect titleMusic;
+        Song titleMusic;
         Song gameplayMusic;
         Video startingVideo;
         Video endingVideo;
-        SoundEffectInstance musicInstance;
 
         /*
          * States
@@ -182,21 +181,21 @@ namespace PangTang
             Texture2D[,] tempTexture2DArray;
 
             // Load all music
-            titleMusic = Content.Load<SoundEffect>("titleMusic");
+            titleMusic = Content.Load<Song>("titleMusic");
             gameplayMusic = Content.Load<Song>("gameplayMusic");
-            musicInstance = titleMusic.CreateInstance();
-            musicInstance.IsLooped = true;
-            musicInstance.Play();
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(titleMusic);
 
             // Load all video
             startingVideo = Content.Load<Video>("video_startingAnimation");
             endingVideo = Content.Load<Video>("video_endingAnimation");
 
             // Load title textures
-            tempTextureArray = new Texture2D[3];
+            tempTextureArray = new Texture2D[4];
             tempTextureArray[0] = titleBackgroundTexture;
             tempTextureArray[1] = Content.Load<Texture2D>("title");
             tempTextureArray[2] = Content.Load<Texture2D>("button_start");
+            tempTextureArray[3] = Content.Load<Texture2D>("button_mute");
 
             tempTextureArray2 = new Texture2D[3];
             tempTextureArray2[0] = Content.Load<Texture2D>("title_tank_0");
@@ -283,24 +282,35 @@ namespace PangTang
                     mouseState = Mouse.GetState();
                     gamePadState = GamePad.GetState(PlayerIndex.One);
                     
-                    if ((mouseState.LeftButton == ButtonState.Pressed) &&
-                         mouseState.X > title.getStartButtonBounds().X &&
-                         mouseState.X < title.getStartButtonBounds().X + title.getStartButtonBounds().Width &&
-                         mouseState.Y > title.getStartButtonBounds().Y &&
-                         mouseState.Y < title.getStartButtonBounds().Y + title.getStartButtonBounds().Height)
+                    // Start the game
+                    if (title.isStartButtonPressed(mouseState))
                     {
                         this.IsMouseVisible = false;
-                        musicInstance.Stop();
+                        MediaPlayer.Stop();
                         startingAnimation.Start();
                         gameState = 1;
                     }
+
+                    if (title.isMuteButtonPressed(mouseState))
+                    {
+                        if (MediaPlayer.IsMuted == false)
+                            MediaPlayer.IsMuted = true;
+                        else
+                            MediaPlayer.IsMuted = false;
+
+                        startingAnimation.ChangeMute();
+                        endingAnimation.ChangeMute();
+
+                    }
+
+
                     break;
                 case 1: // Starting animation
                     mouseState = Mouse.GetState();
                     if (startingAnimation.isFinished() || mouseState.LeftButton == ButtonState.Pressed)
                     {
                         startingAnimation.Stop();
-                        MediaPlayer.IsRepeating = true;
+                        
                         MediaPlayer.Play(gameplayMusic);
                         gameState = 2;
                     }
@@ -338,7 +348,14 @@ namespace PangTang
                     }
 
                     // Increase counters for any water-funnel collisions.
-                    int collisions = water.getFunnelCollisions(funnel.GetCollisionBounds());
+                    // From level 8 onward, return the entire funnel collision bounds because the water
+                    // droplets move too fast between frames for collisions to be detected.
+                    int collisions;
+                    if (currentLevel < 8)
+                        collisions = water.getFunnelCollisions(funnel.GetCollisionBounds());
+                    else 
+                        collisions = water.getFunnelCollisions(funnel.GetBounds());
+                    
                     totalDropsCaught += collisions;
                     levelDropsCaught += collisions;
 
@@ -472,17 +489,8 @@ namespace PangTang
                 case 1: // Starting Animation
                     break;
                 case 2: // Game Started
-                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(19, 15), new Color(236, 166, 32));
-                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(19, 50), new Color(236, 166, 32));
-
-                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(21, 15), new Color(236, 166, 32));
-                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(21, 50), new Color(236, 166, 32));
-
-                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 14), new Color(236, 166, 32));
-                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(20, 49), new Color(236, 166, 32));
-
-                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 16), new Color(236, 166, 32));
-                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(20, 51), new Color(236, 166, 32));
+                    spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(23, 18), new Color(236, 166, 32));
+                    spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(23, 53), new Color(236, 166, 32));
 
                     spriteBatch.DrawString(dropsCaughtFont, "Level: " + currentLevel, new Vector2(20, 15), new Color(201, 110, 0));
                     spriteBatch.DrawString(dropsCaughtFont, "Total     : " + totalDropsCaught, new Vector2(20, 50), new Color(201, 110, 0));
@@ -545,9 +553,8 @@ namespace PangTang
             {
                 if (currentFrame > 0)
                 {
-                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(527, 202), Color.Black);
-                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(525, 200), new Color(255, 255, 0));
-                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(524, 199), new Color(28, 22, 101));
+                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(530, 205), new Color(236, 166, 32));
+                    spriteBatch.DrawString(spriteFont, "Level " + level, new Vector2(525, 200), new Color(201, 110, 0));
                     currentFrame -= 8;
                 }
                 else

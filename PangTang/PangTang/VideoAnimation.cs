@@ -57,6 +57,14 @@ namespace PangTang
             videoPlayer.Stop();
         }
 
+        public void ChangeMute()
+        {
+            if (videoPlayer.IsMuted == false)
+                videoPlayer.IsMuted = true;
+            else
+                videoPlayer.IsMuted = false;
+        }
+
         public void Draw(SpriteBatch spriteBatch)
         {
             if (videoPlayer.State != MediaState.Stopped)

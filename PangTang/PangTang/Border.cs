@@ -71,7 +71,7 @@ namespace PangTang
         {
             if (this.totalDropsCaught < totalDropsCaught)
             {
-                this.totalDropsCaught++;
+                this.totalDropsCaught = totalDropsCaught;
                 animationFrame++;
             }
         }
@@ -99,6 +99,10 @@ namespace PangTang
                 else
                     animationFrame++;
             }
+
+            // Just in case.
+            if (animationFrame > 30)
+                animationFrame = -1;
 
             spriteBatch.Draw(hoseEndTexture, hoseEndPosition, Color.White);
         }
