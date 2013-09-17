@@ -92,6 +92,8 @@ namespace PangTang
         Texture2D highScoresTitle; // Because we can.
         Rectangle orderingRectangle; // Rectangle for 1st, 2nd, etc.
         Rectangle highScoresVals;  // Rectangle for the high scores
+        Texture2D retryButtonTexture;  // Retry button texture
+        Rectangle retryButton; // The retry button
 
         /*
          * Fonts
@@ -145,6 +147,7 @@ namespace PangTang
                 0,
                 (windowAreaRectangle.Width / 2) - 10,
                 graphics.PreferredBackBufferHeight);
+            
 
             // Set some starting values.
             seconds = 0.0f;
@@ -188,6 +191,7 @@ namespace PangTang
             gameplayBackgroundTexture = Content.Load<Texture2D>("background_game");
             blackTexture = Content.Load<Texture2D>("background_black");
             waterDropUITexture = Content.Load<Texture2D>("water_0");
+            
 
             // Temporary texture arrays for loading batches of textures or textures that are animated. 
             Texture2D[] tempTextureArray;
@@ -272,6 +276,14 @@ namespace PangTang
 
             // Load High Scores title
             highScoresTitle = Content.Load<Texture2D>("title_highScores");
+
+            //Load retry button
+            retryButtonTexture = Content.Load<Texture2D>("button_retry");
+            retryButton = new Rectangle(
+                100,
+                400,
+                retryButtonTexture.Width,
+                retryButtonTexture.Height);
 
             StartGame();
         }
@@ -429,10 +441,10 @@ namespace PangTang
                     gamePadState = GamePad.GetState(PlayerIndex.One);
 
                     if ((mouseState.LeftButton == ButtonState.Pressed) &&
-                         mouseState.X > 100 &&
-                         mouseState.X < 200 &&
-                         mouseState.Y > 400 &&
-                         mouseState.Y < 450)
+                         mouseState.X > retryButton.X &&
+                         mouseState.X < retryButton.X+retryButton.Width &&
+                         mouseState.Y > retryButton.Y &&
+                         mouseState.Y < retryButton.Y+retryButton.Height)
                     {
                         gameState = 0;
                         ResetValues();
@@ -520,8 +532,7 @@ namespace PangTang
                     break;
                 case 4: // High Scores
                     spriteBatch.Draw(highScoresTitle, new Vector2((windowAreaRectangle.Width / 2) - (highScoresTitle.Width / 2), windowAreaRectangle.Height / 30), Color.White);
-                    spriteBatch.DrawString(dropsCaughtFont, "Retry?", new Vector2(100, 400), new Color(236, 166, 32));
-                    spriteBatch.DrawString(dropsCaughtFont, "Retry?", new Vector2(97, 397), new Color(201, 110, 0));
+                    spriteBatch.Draw(retryButtonTexture, new Vector2(100, 400), Color.White);
                     string first, second, third, fourth, fifth;
                     first = "" + highScores.getHighScore(1);
                     second = "" + highScores.getHighScore(2);
