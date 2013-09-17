@@ -95,5 +95,16 @@ namespace PangTang
             textureStage++;
         }
 
+        public void Reset()
+        {
+            currentThreshold = 1.0f;
+
+            // Position reflects the center of the tank area rectangle.
+            position.X = (tankAreaRectangle.Width - texture[0, 0].Width) / 2;
+            position.X += tankAreaRectangle.X;
+            position.Y = (tankAreaRectangle.Height - texture[0, 0].Height) / 2;
+            position.Y += tankAreaRectangle.Y;
+        }
+
     }
 }

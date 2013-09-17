@@ -83,5 +83,10 @@ namespace PangTang
         }
 
 
+        public void Reset()
+        {
+            animationFinished = false;
+        }
+
     }
 }

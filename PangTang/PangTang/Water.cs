@@ -198,5 +198,20 @@ namespace PangTang
                 }
             }
         }
+
+        public void Reset()
+        {
+            // Establish texture, water width/height, play area, starting speed, and active state.
+            textureStage = 0;
+            bounds.Width = texture[0].Width;
+            bounds.Height = texture[0].Height;
+            waterSpeed = waterStartSpeed;
+
+            positions = new Vector2[10];
+            isActive = new bool[10];
+
+            for (int i = 0; i < isActive.Length; i++)
+                isActive[i] = false;
+        }
     }
 }

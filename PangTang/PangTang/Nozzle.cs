@@ -135,5 +135,25 @@ namespace PangTang
 
             textureStage++;
         }
+
+        public void Reset()
+        {
+            // Establish texture, play area, and starting speed.
+            textureStage = 0;
+            nozzleSpeed = nozzleStartSpeed;
+
+            // Calculate positions based on the play area.
+            positions = new int[7];
+            positions[0] = playAreaRectangle.X;
+            for (int i = 1; i < 6; i++)
+            {
+                positions[i] = i * (playAreaRectangle.Width / 6);
+                positions[i] += playAreaRectangle.X;
+            }
+            positions[6] = playAreaRectangle.X + playAreaRectangle.Width;
+            positions[6] -= texture[0].Width * 2;
+
+            SetInStartPosition();
+        }
     }
 }

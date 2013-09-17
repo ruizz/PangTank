@@ -89,14 +89,16 @@ namespace PangTang
         /*
          * High Scores
          */
-        string highScoresList; // The high scores for the game
         Texture2D highScoresTitle; // Because we can.
+        Rectangle orderingRectangle; // Rectangle for 1st, 2nd, etc.
+        Rectangle highScoresVals;  // Rectangle for the high scores
 
         /*
          * Fonts
          */
         SpriteFont dropsCaughtFont;
         SpriteFont levelFont;
+        SpriteFont highScoresFont;
 
         /*
          * Constructor
@@ -130,6 +132,20 @@ namespace PangTang
                 graphics.PreferredBackBufferWidth - tankAreaRectangle.Width,
                 graphics.PreferredBackBufferHeight);
 
+            // High scores ordering rectangle
+            orderingRectangle = new Rectangle(
+                0,
+                0,
+                (windowAreaRectangle.Width / 2) - 10,
+                graphics.PreferredBackBufferHeight);
+
+            // High scores rectangle
+            highScoresVals = new Rectangle(
+                (windowAreaRectangle.Width / 2) + 10,
+                0,
+                (windowAreaRectangle.Width / 2) - 10,
+                graphics.PreferredBackBufferHeight);
+
             // Set some starting values.
             seconds = 0.0f;
             totalDropsCaught = 0;
@@ -141,7 +157,7 @@ namespace PangTang
             waterInterval = 2.0f;
             levelDropRequirement = 5;
             speedMultiplier = 1.4f;
-            this.Window.Title = "PangTang";
+            this.Window.Title = "PangTank";
         }
 
         /// <summary>
@@ -242,6 +258,7 @@ namespace PangTang
 
             // Load fonts
             dropsCaughtFont = Content.Load<SpriteFont>("dropsCaughtFont");
+            highScoresFont = Content.Load<SpriteFont>("highScoresFont");
             levelFont = Content.Load<SpriteFont>("levelFont");
 
             // Load Border
@@ -278,6 +295,7 @@ namespace PangTang
             switch (gameState)
             {
                 case 0: // Title screen
+                    
                     this.IsMouseVisible = true;
                     mouseState = Mouse.GetState();
                     gamePadState = GamePad.GetState(PlayerIndex.One);
@@ -417,6 +435,7 @@ namespace PangTang
                          mouseState.Y < 450)
                     {
                         gameState = 0;
+                        ResetValues();
                     }
                     break;
             }
@@ -500,12 +519,75 @@ namespace PangTang
                 case 3: // Ending Animation
                     break;
                 case 4: // High Scores
-                    highScoresList = highScores.makeHighScoreString();
                     spriteBatch.Draw(highScoresTitle, new Vector2((windowAreaRectangle.Width / 2) - (highScoresTitle.Width / 2), windowAreaRectangle.Height / 30), Color.White);
-                    spriteBatch.DrawString(dropsCaughtFont, highScoresList, new Vector2((windowAreaRectangle.Width / 2)-75, (windowAreaRectangle.Height / 30) + 150), Color.Black);
-                    spriteBatch.DrawString(dropsCaughtFont, "Retry?", new Vector2(100, 400), Color.Black);
+                    spriteBatch.DrawString(dropsCaughtFont, "Retry?", new Vector2(100, 400), new Color(236, 166, 32));
+                    spriteBatch.DrawString(dropsCaughtFont, "Retry?", new Vector2(97, 397), new Color(201, 110, 0));
+                    string first, second, third, fourth, fifth;
+                    first = "" + highScores.getHighScore(1);
+                    second = "" + highScores.getHighScore(2);
+                    third = "" + highScores.getHighScore(3);
+                    fourth = "" + highScores.getHighScore(4);
+                    fifth = "" + highScores.getHighScore(5);
+
+                    DrawScore1(highScoresFont, "1st:", orderingRectangle, 2, new Color(236, 166, 32));
+                    DrawScore1(highScoresFont, "\n\n2nd:", orderingRectangle, 2, new Color(236, 166, 32));
+                    DrawScore1(highScoresFont, "\n\n\n\n3rd:", orderingRectangle, 2, new Color(236, 166, 32));
+                    DrawScore1(highScoresFont, "\n\n\n\n\n\n4th:", orderingRectangle, 2, new Color(236, 166, 32));
+                    DrawScore1(highScoresFont, "\n\n\n\n\n\n\n\n5th:", orderingRectangle, 2, new Color(236, 166, 32));
+                    DrawScore1(highScoresFont, first, highScoresVals, 1, new Color(236, 166, 32));
+                    DrawScore1(highScoresFont, "\n\n" + second, highScoresVals, 1, new Color(236, 166, 32));
+                    DrawScore1(highScoresFont, "\n\n\n\n" + third, highScoresVals, 1, new Color(236, 166, 32));
+                    DrawScore1(highScoresFont, "\n\n\n\n\n\n" + fourth, highScoresVals, 1, new Color(236, 166, 32));
+                    DrawScore1(highScoresFont, "\n\n\n\n\n\n\n\n" + fifth, highScoresVals, 1, new Color(236, 166, 32));
+
+                    DrawScore2(highScoresFont, "1st:", orderingRectangle, 2, new Color(201, 110, 0));
+                    DrawScore2(highScoresFont, "\n\n2nd:", orderingRectangle, 2, new Color(201, 110, 0));
+                    DrawScore2(highScoresFont, "\n\n\n\n3rd:", orderingRectangle, 2, new Color(201, 110, 0));
+                    DrawScore2(highScoresFont, "\n\n\n\n\n\n4th:", orderingRectangle, 2, new Color(201, 110, 0));
+                    DrawScore2(highScoresFont, "\n\n\n\n\n\n\n\n5th:", orderingRectangle, 2, new Color(201, 110, 0));
+                    DrawScore2(highScoresFont, first, highScoresVals, 1, new Color(201, 110, 0));
+                    DrawScore2(highScoresFont, "\n\n" + second, highScoresVals, 1, new Color(201, 110, 0));
+                    DrawScore2(highScoresFont, "\n\n\n\n" + third, highScoresVals, 1, new Color(201, 110, 0));
+                    DrawScore2(highScoresFont, "\n\n\n\n\n\n" + fourth, highScoresVals, 1, new Color(201, 110, 0));
+                    DrawScore2(highScoresFont, "\n\n\n\n\n\n\n\n" + fifth, highScoresVals, 1, new Color(201, 110, 0));
+
+                    
+                    
                     break;
             }
+        }
+
+
+        //Drawing the Strings for high scores
+        public void DrawScore1(SpriteFont font, string text, Rectangle bounds, int align, Color color)
+        {
+            Vector2 size = font.MeasureString(text);
+            Vector2 pos = new Vector2(bounds.Center.X, bounds.Center.Y - 50);
+            Vector2 origin = size * 0.5f;
+
+            if (align == 1)
+                origin.X += bounds.Width / 2 - size.X / 2;
+
+            if (align == 2)
+                origin.X -= bounds.Width / 2 - size.X / 2;
+
+            spriteBatch.DrawString(font, text, pos, color, 0, origin, 1, SpriteEffects.None, 0);
+        }
+
+        // Adds the shadow effect to the scores
+        public void DrawScore2(SpriteFont font, string text, Rectangle bounds, int align, Color color)
+        {
+            Vector2 size = font.MeasureString(text);
+            Vector2 pos = new Vector2(bounds.Center.X - 3, bounds.Center.Y - 53);
+            Vector2 origin = size * 0.5f;
+
+            if (align == 1)
+                origin.X += bounds.Width / 2 - size.X / 2;
+
+            if (align == 2)
+                origin.X -= bounds.Width / 2 - size.X / 2;
+
+            spriteBatch.DrawString(font, text, pos, color, 0, origin, 1, SpriteEffects.None, 0);
         }
 
         // Places the funnel and ball in the start positions.
@@ -514,6 +596,31 @@ namespace PangTang
             // Set funnel in start position
             funnel.SetInStartPosition();
             nozzle.SetInStartPosition();
+        }
+
+        // Resets the starting values
+        private void ResetValues()
+        {
+            funnel.Reset();
+            nozzle.Reset();
+            water.Reset();
+            tank.Reset();
+
+            // Set some starting values.
+            seconds = 0.0f;
+            totalDropsCaught = 0;
+            levelDropsCaught = 0;
+            currentLevel = 1;
+            gameState = 0;
+
+            // -- CHANGE ANY DEFAULT STARTING VALUES HERE --
+            waterInterval = 2.0f;
+            levelDropRequirement = 5;
+            speedMultiplier = 1.4f;
+
+            startingAnimation.Reset();
+            endingAnimation.Reset();
+            MediaPlayer.Play(titleMusic);
         }
 
         private class FadeInAnimation

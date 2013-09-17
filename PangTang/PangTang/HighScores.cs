@@ -119,13 +119,26 @@ namespace PangTang
             //    scoreBoardString = scoreBoardString + data2.Score[i] + "\n";
             //}
 
-            scoreBoardString = "1st: " + data2.Score[4] + "\n2nd: " + data2.Score[3] +
-                               "\n3rd: " + data2.Score[2] + "\n4th: " + data2.Score[1] +
-                               "\n5th: " + data2.Score[0];
+            scoreBoardString = "" + data2.Score[4] + "\n" + data2.Score[3] +
+                               "\n" + data2.Score[2] + "\n" + data2.Score[1] +
+                               "\n" + data2.Score[0];
 
             return scoreBoardString;
         }
 
+        public int getHighScore(int place)
+        {
+            HighScoreData data2 = LoadHighScores(HighScoresFilename);
+
+            int temp = 5 - place;
+
+            if (temp < 0)
+            {
+                return -1;
+            }
+
+            return data2.Score[temp];
+        }
 
         /*
          * Voids

@@ -131,5 +131,12 @@ namespace PangTang
 
             textureStage++;
         }
+
+        public void Reset()
+        {
+            textureStage = 0;
+            mousePosition = Vector2.Zero;
+            SetInStartPosition();
+        }
     }
 }
