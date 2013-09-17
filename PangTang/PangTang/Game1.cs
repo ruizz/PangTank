@@ -43,6 +43,7 @@ namespace PangTang
 
         Texture2D gameplayBackgroundTexture; // Background during gameplay.
         Texture2D titleBackgroundTexture; // Background during title and highscores.
+        Texture2D highScoresBackgroundTexture;
         Texture2D blackTexture; // Used as a black screen.
 
         Texture2D waterDropUITexture; // Water drople used for the UI.
@@ -188,6 +189,7 @@ namespace PangTang
 
             // Assigning the black screen and background that is used during gameplay.
             titleBackgroundTexture = Content.Load<Texture2D>("background_title");
+            highScoresBackgroundTexture = Content.Load<Texture2D>("background_highScores");
             gameplayBackgroundTexture = Content.Load<Texture2D>("background_game");
             blackTexture = Content.Load<Texture2D>("background_black");
             waterDropUITexture = Content.Load<Texture2D>("water_0");
@@ -496,7 +498,7 @@ namespace PangTang
                     endingAnimation.Draw(spriteBatch);
                     break;
                 case 4: // High Scores
-                    spriteBatch.Draw(titleBackgroundTexture, new Vector2(0, 0), Color.White);
+                    spriteBatch.Draw(highScoresBackgroundTexture, new Vector2(0, 0), Color.White);
                     DrawText();
 
                     FadeInAnimation.Draw(blackTexture, spriteBatch, windowAreaRectangle);
