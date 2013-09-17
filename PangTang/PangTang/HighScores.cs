@@ -14,7 +14,7 @@ using Microsoft.Xna.Framework.GamerServices;
 
 namespace PangTang
 {
-    public class HighScores : Microsoft.Xna.Framework.Game
+    public class HighScores
     {
 
         [Serializable]
@@ -41,16 +41,16 @@ namespace PangTang
          */
         public HighScores(int score)
         {
-            Initialize();
+            SetUp();
             
-            data = LoadHighScores(HighScoresFilename);
+            this.data = LoadHighScores(HighScoresFilename);
             
-            PlayerScore = score;
+            this.PlayerScore = score;
 
             SaveHighScore();
         }
 
-        protected override void Initialize()
+        public void SetUp()
         {
             //  Get the path of the save game
             string fullPath = "highscores.dat";
@@ -73,8 +73,6 @@ namespace PangTang
 
                 SaveHighScores(data, HighScoresFilename);
             }
-
-            base.Initialize();
         }
 
         /*

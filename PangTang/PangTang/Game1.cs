@@ -428,7 +428,7 @@ namespace PangTang
                         endingAnimation.Stop();
                         FadeInAnimation.Reset();
                         MediaPlayer.Play(gameplayMusic);
-                        //highScores = new HighScores(totalDropsCaught);
+                        highScores = new HighScores(totalDropsCaught);
                         gameState = 4;
                     }
                     break;
@@ -513,7 +513,6 @@ namespace PangTang
             switch (gameState)
             {
                 case 0: // Title Screen
-                    spriteBatch.DrawString(dropsCaughtFont, Mouse.GetState().X.ToString() + " | " + Mouse.GetState().Y.ToString(), new Vector2(23, 18), new Color(236, 166, 32));
                     break;
                 case 1: // Starting Animation
                     break;
@@ -530,11 +529,9 @@ namespace PangTang
                     break;
                 case 4: // High Scores
 
-                    spriteBatch.DrawString(dropsCaughtFont, Mouse.GetState().X.ToString() + " | " + Mouse.GetState().Y.ToString(), new Vector2(23, 18), new Color(236, 166, 32));
-
                     spriteBatch.Draw(highScoresTitle, new Vector2((windowAreaRectangle.Width / 2) - (highScoresTitle.Width / 2), windowAreaRectangle.Height / 30), Color.White);
                     spriteBatch.Draw(retryButtonTexture, new Vector2(100, 400), Color.White);
-                    /*string first, second, third, fourth, fifth;
+                    string first, second, third, fourth, fifth;
                     first = "" + highScores.getHighScore(1);
                     second = "" + highScores.getHighScore(2);
                     third = "" + highScores.getHighScore(3);
@@ -561,7 +558,7 @@ namespace PangTang
                     DrawScore2(highScoresFont, "\n\n" + second, highScoresVals, 1, new Color(201, 110, 0));
                     DrawScore2(highScoresFont, "\n\n\n\n" + third, highScoresVals, 1, new Color(201, 110, 0));
                     DrawScore2(highScoresFont, "\n\n\n\n\n\n" + fourth, highScoresVals, 1, new Color(201, 110, 0));
-                    DrawScore2(highScoresFont, "\n\n\n\n\n\n\n\n" + fifth, highScoresVals, 1, new Color(201, 110, 0));*/
+                    DrawScore2(highScoresFont, "\n\n\n\n\n\n\n\n" + fifth, highScoresVals, 1, new Color(201, 110, 0));
                     break;
             }
         }
