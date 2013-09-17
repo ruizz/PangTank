@@ -95,10 +95,10 @@ namespace PangTang
         public bool isStartButtonPressed(MouseState mouseState)
         {
             if ((mouseState.LeftButton == ButtonState.Pressed) &&
-                         mouseState.X > startButton.X &&
-                         mouseState.X < startButton.X + startButton.Width &&
-                         mouseState.Y > startButton.Y &&
-                         mouseState.Y < startButton.Y + startButton.Height)
+                         mouseState.X > startButtonPosition.X &&
+                         mouseState.X < startButtonPosition.X + startButton.Width &&
+                         mouseState.Y > startButtonPosition.Y &&
+                         mouseState.Y < startButtonPosition.Y + startButton.Height)
                 return true;
             else
                 return false;
@@ -117,10 +117,10 @@ namespace PangTang
 
             if (!buttonHeldDown &&
                         (mouseState.LeftButton == ButtonState.Pressed) &&
-                         mouseState.X > muteButton.X &&
-                         mouseState.X < muteButton.X + muteButton.Width &&
-                         mouseState.Y > muteButton.Y &&
-                         mouseState.Y < muteButton.Y + muteButton.Height)
+                         mouseState.X > muteButtonPosition.X &&
+                         mouseState.X < muteButtonPosition.X + muteButton.Width &&
+                         mouseState.Y > muteButtonPosition.Y &&
+                         mouseState.Y < muteButtonPosition.Y + muteButton.Height)
             {
                 buttonHeldDown = true;
                 return true;

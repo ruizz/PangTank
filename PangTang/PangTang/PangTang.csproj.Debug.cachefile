@@ -1,4 +1,6 @@
 Content\dropsCaughtFont.xnb
+Content\levelFont.xnb
+Content\highScoresFont.xnb
 Content\funnel_0.xnb
 Content\funnel_1.xnb
 Content\funnel_2.xnb
@@ -24,15 +26,15 @@ Content\button_start.xnb
 Content\divider_0.xnb
 Content\hoseEnd_0.xnb
 Content\title_highScores.xnb
-Content\video_startingAnimation.xnb
-Content\video_endingAnimation.xnb
-Content\levelFont.xnb
 Content\divider_1.xnb
 Content\divider_2.xnb
 Content\divider_3.xnb
+Content\button_mute.xnb
+Content\video_startingAnimation.xnb
+Content\video_endingAnimation.xnb
 Content\gameplayMusic.xnb
 Content\titleMusic.xnb
-Content\button_mute.xnb
+Content\button_retry.xnb
 Content\video_startingAnimation.wmv
 Content\video_endingAnimation.wmv
 Content\gameplayMusic.wma
