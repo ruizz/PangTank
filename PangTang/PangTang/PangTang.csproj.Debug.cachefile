@@ -30,12 +30,14 @@ Content\divider_1.xnb
 Content\divider_2.xnb
 Content\divider_3.xnb
 Content\button_mute.xnb
-Content\button_retry.xnb
 Content\video_startingAnimation.xnb
 Content\video_endingAnimation.xnb
 Content\gameplayMusic.xnb
 Content\titleMusic.xnb
+Content\button_retry.xnb
 Content\background_highScores.xnb
+Content\leak_0.xnb
+Content\leak_1.xnb
 Content\video_startingAnimation.wmv
 Content\video_endingAnimation.wmv
 Content\gameplayMusic.wma

@@ -250,7 +250,7 @@ namespace PangTang
             water = new Water(tempTextureArray, playAreaRectangle);
 
             // Load Tank (3x the sprites)
-            tempTexture2DArray = new Texture2D[3, 3];
+            tempTexture2DArray = new Texture2D[4, 2];
             tempTexture2DArray[0, 0] = Content.Load<Texture2D>("tank_0_0"); 
             tempTexture2DArray[0, 1] = Content.Load<Texture2D>("tank_0_1"); 
 
@@ -259,6 +259,9 @@ namespace PangTang
 
             tempTexture2DArray[2, 0] = Content.Load<Texture2D>("tank_2_0");
             tempTexture2DArray[2, 1] = Content.Load<Texture2D>("tank_2_1");
+
+            tempTexture2DArray[3, 0] = Content.Load<Texture2D>("leak_0");
+            tempTexture2DArray[3, 1] = Content.Load<Texture2D>("leak_1");
 
             tank = new Tank(tempTexture2DArray, tankAreaRectangle);
 
